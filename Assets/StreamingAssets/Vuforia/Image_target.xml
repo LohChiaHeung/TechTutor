@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="keyboard3" size="1.000000 0.694531" />
+    <ImageTarget name="keyboard2" size="1.000000 0.613281" />
+    <ImageTarget name="keyboard" size="10.000000 5.898438" />
+    <ImageTarget name="screenshot-mockupdesign9" size="1.000000 0.880266" />
+    <ImageTarget name="laptop2" size="1.000000 0.750000" />
+    <ImageTarget name="laptop" size="1.000000 0.750000" />
+  </Tracking>
+</QCARConfig>
