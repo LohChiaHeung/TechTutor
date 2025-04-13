@@ -155,7 +155,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mObserverBehaviour: {fileID: 137356211}
   mHiddenRoot: {fileID: 0}
-  mTargetName: keyboard3
+  mTargetName: laptop1_pic_cropped2_latest
   mDatasetName: Vuforia/Image_target.xml
   mCastedBehaviour: {fileID: 137356211}
   mMeshFilter: {fileID: 0}
@@ -219,13 +219,13 @@ MonoBehaviour:
   PreviewVisible: 1
   RuntimeOcclusion: 0
   RuntimeCollider: 0
-  mTrackableName: keyboard3
+  mTrackableName: laptop1_pic_cropped2_latest
   mInitializedInEditor: 1
   mDataSetPath: Vuforia/Image_target.xml
-  mAspectRatio: 0.694531
+  mAspectRatio: 0.620609
   mImageTargetType: 0
   mWidth: 1
-  mHeight: 0.694531
+  mHeight: 0.620609
   mRuntimeTexture: {fileID: 0}
   mMotionHint: 1
   mTrackingOptimization: 0

@@ -12,6 +12,11 @@ public class SceneSwitcher : MonoBehaviour
     {
         SceneManager.LoadScene("SampleScene");
     }
+
+    public void LoadCalculatorTutorial()
+    {
+        SceneManager.LoadScene("CalculatorTutorial");
+    }
 }
 
 
