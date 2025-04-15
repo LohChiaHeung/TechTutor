@@ -17,6 +17,21 @@ public class SceneSwitcher : MonoBehaviour
     {
         SceneManager.LoadScene("CalculatorTutorial");
     }
+
+    public void LoadMicrosoftWordTutorial()
+    {
+        SceneManager.LoadScene("MicrosoftWordTutorial");
+    }
+
+    public void LoadChatBot()
+    {
+        SceneManager.LoadScene("SimpleChatTest");
+
+    }
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }
 
 

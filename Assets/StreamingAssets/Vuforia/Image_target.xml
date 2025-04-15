@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="microsoftword_part2_homep2" size="1.000000 0.556617" />
+    <ImageTarget name="microsoftword_part2_home" size="1.000000 0.257888" />
+    <ImageTarget name="microsoftword_part1_pic" size="1.000000 0.470000" />
     <ImageTarget name="calculator_image" size="1.000000 1.671717" />
-    <ImageTarget name="windows_button_test" size="1.000000 0.750000" />
     <ImageTarget name="laptop2_test" size="1.000000 0.522656" />
     <ImageTarget name="laptop1_pic_cropped2_latest" size="1.000000 0.620609" />
     <ImageTarget name="laptop1_featureoptimized_crop" size="1.000000 0.384746" />
