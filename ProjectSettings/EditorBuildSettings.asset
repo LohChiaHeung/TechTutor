@@ -12,9 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/SendEmailScene.unity
     guid: 86741172bc24f2f40959d548b479e7e4
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
     path: Assets/Scenes/CalculatorTutorial.unity
     guid: 26dd4cf7cc5fccc47b4bb81ecf9a06c3
   - enabled: 1
@@ -24,7 +21,7 @@ EditorBuildSettings:
     path: Assets/Scenes/ChatBotScene.unity
     guid: 63f6801a98746f74ca84154f48a86401
   - enabled: 1
-    path: Assets/Scenes/SimpleChatTest.unity
-    guid: 302d594d10fb5e54597108afb4b0c646
+    path: Assets/Scenes/ComputerComponent.unity
+    guid: 29207cebf6c08c942a3fc46f71b09765
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 3dfe21925bcab5a4aa024d409bc21974, type: 2}

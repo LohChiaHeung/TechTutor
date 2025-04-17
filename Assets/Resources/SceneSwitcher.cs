@@ -10,7 +10,7 @@ public class SceneSwitcher : MonoBehaviour
 
     public void LoadComputerKeyboardComponents()
     {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("ComputerComponent");
     }
 
     public void LoadCalculatorTutorial()
@@ -25,7 +25,7 @@ public class SceneSwitcher : MonoBehaviour
 
     public void LoadChatBot()
     {
-        SceneManager.LoadScene("SimpleChatTest");
+        SceneManager.LoadScene("ChatBotScene");
 
     }
     public void LoadMainMenu()

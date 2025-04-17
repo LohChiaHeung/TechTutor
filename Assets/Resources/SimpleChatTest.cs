@@ -10,15 +10,17 @@ public class SimpleChatTest : MonoBehaviour
     public TMP_Text responseText;          // Text field to show AI response
     public ScrollRect chatScrollRect;      // ScrollRect to auto-scroll
     public ScrollRect inputScroll;
-    public string openRouterApiKey = "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"; 
+    //public string openRouterApiKey = "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"; 
+    public string openAIKey = "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";
+
 
     public void OnSendClicked()
     {
         if (!string.IsNullOrWhiteSpace(userInput.text))
         {
-            StartCoroutine(SendMessageToOpenRouter(userInput.text));
+            string userMessage = userInput.text;
             userInput.text = "";
-            chatScrollRect.verticalNormalizedPosition = 0f;
+            StartCoroutine(SendMessageToOpenAI(userMessage));
         }
         else
         {
@@ -26,30 +28,27 @@ public class SimpleChatTest : MonoBehaviour
         }
     }
 
-    IEnumerator SendMessageToOpenRouter(string userMessage)
+    IEnumerator SendMessageToOpenAI(string userMessage)
     {
-        string escapedMessage = userMessage.Replace("\"", "\\\"");
+        string url = "https://api.openai.com/v1/chat/completions";
 
-        string url = "https://openrouter.ai/api/v1/chat/completions";
         string json = @"{
-        ""model"": ""mistralai/mistral-7b-instruct"",
-        ""messages"": [
-            {""role"": ""system"", ""content"": ""You are a friendly tech tutor who helps beginners learn how to use a computer.""},
-            {""role"": ""user"", ""content"": """ + escapedMessage + @"""}
-        ]
-    }";
+            ""model"": ""gpt-3.5-turbo"",
+            ""messages"": [
+                {""role"": ""system"", ""content"": ""You are a friendly and helpful tech tutor who helps beginners learn how to use a computer.""},
+                {""role"": ""user"", ""content"": """ + userMessage.Replace("\"", "\\\"") + @"""}
+            ]
+        }";
 
         UnityWebRequest request = new UnityWebRequest(url, "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        request.SetRequestHeader("X-Title", "TechTutorChatApp");
         request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("Authorization", "Bearer " + openRouterApiKey);
-        request.SetRequestHeader("HTTP-Referer", "https://techtutor.ai");
+        request.SetRequestHeader("Authorization", "Bearer " + openAIKey);
 
-        // ✅ Append user's question and "Thinking..." (no typing yet)
+        // Show user input + thinking...
         responseText.text += $"\n\nYou: {userMessage}\n\nTechTutor: Thinking...";
 
         Canvas.ForceUpdateCanvases();
@@ -62,7 +61,6 @@ public class SimpleChatTest : MonoBehaviour
             string jsonResponse = request.downloadHandler.text;
             string reply = ExtractReply(jsonResponse);
 
-            // ✅ Replace only the "Thinking..." part with the animated reply
             string previousText = responseText.text.Replace("TechTutor: Thinking...", "TechTutor: ");
             StartCoroutine(TypeText(previousText, reply));
         }
@@ -74,6 +72,7 @@ public class SimpleChatTest : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         chatScrollRect.verticalNormalizedPosition = 0f;
     }
+
 
     IEnumerator TypeText(string baseText, string newText, float delay = 0.02f)
     {
@@ -91,22 +90,18 @@ public class SimpleChatTest : MonoBehaviour
         }
     }
 
+
     string ExtractReply(string json)
     {
         try
         {
-            int start = json.IndexOf("\"content\":\"") + 11;
-            int end = json.IndexOf("\"", start);
-
-            if (start > 10 && end > start)
-            {
-                string content = json.Substring(start, end - start);
-                return content.Replace("\\n", "\n").Replace("\\\"", "\"");
-            }
+            OpenAIResponse parsed = JsonUtility.FromJson<OpenAIWrapper>("{\"wrapper\":" + json + "}").wrapper;
+            return parsed.choices[0].message.content;
         }
-        catch { }
-
-        return "(Could not parse reply)";
+        catch
+        {
+            return "(Could not parse reply)";
+        }
     }
 
     void Update()
@@ -117,4 +112,45 @@ public class SimpleChatTest : MonoBehaviour
             inputScroll.verticalNormalizedPosition = 0f;
         }
     }
+
+    [System.Serializable]
+    public class OpenAIWrapper
+    {
+        public OpenAIResponse wrapper;
+    }
+
+    [System.Serializable]
+    public class OpenAIResponse
+    {
+        public Choice[] choices;
+    }
+
+    [System.Serializable]
+    public class Choice
+    {
+        public Message message;
+    }
+
+    [System.Serializable]
+    public class Message
+    {
+        public string role;
+        public string content;
+    }
+
+
+    public static class JsonHelper
+    {
+        public static string GetJsonArray(string json, string arrayName)
+        {
+            int start = json.IndexOf($"\"{arrayName}\":[");
+            if (start == -1) return "[]";
+
+            int arrayStart = json.IndexOf('[', start);
+            int arrayEnd = json.IndexOf("]", arrayStart);
+
+            return json.Substring(arrayStart, arrayEnd - arrayStart + 1);
+        }
+    }
+
 }
