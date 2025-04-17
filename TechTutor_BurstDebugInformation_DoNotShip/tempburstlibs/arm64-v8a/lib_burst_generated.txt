@@ -1,0 +1,18 @@
+Library: C:\Users\Chia Heung\Unity Project\AR_Rendering_Learning\Temp\BurstOutput\tempburstlibs\arm64-v8a\lib_burst_generated
+--platform=Android
+--backend=burst-llvm-16
+--target=ARMV8A_AARCH64
+--global-safety-checks-setting=Off
+--meta-data-generation=False
+--dump=Function
+--float-precision=Standard
+--target-framework=NetFramework
+--generate-link-xml=Temp\burst.link.xml
+--temp-folder=C:\Users\Chia Heung\Unity Project\AR_Rendering_Learning\Temp\Burst
+--debug=Full
+--key-folder=C:/Users/Chia Heung/Desktop/Unity/2022.3.57f1/Editor/Data/PlaybackEngines/AndroidPlayer
+--decode-folder=C:\Users\Chia Heung\Unity Project\AR_Rendering_Learning\Library\Burst
+--output=C:\Users\Chia Heung\Unity Project\AR_Rendering_Learning\Temp\BurstOutput\tempburstlibs\arm64-v8a\lib_burst_generated
+--pdb-search-paths=Temp/ManagedSymbols/
+
+

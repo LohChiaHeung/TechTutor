@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="keyboard_qr_marker" size="15.000000 7.124431" />
+    <ImageTarget name="laptop2_qr_marker" size="15.000000 11.750681" />
+    <ImageTarget name="laptop_qr_marker" size="15.000000 12.102273" />
     <ImageTarget name="microsoftword_part2_homep2" size="1.000000 0.556617" />
     <ImageTarget name="microsoftword_part2_home" size="1.000000 0.257888" />
     <ImageTarget name="microsoftword_part1_pic" size="1.000000 0.470000" />

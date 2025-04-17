@@ -28,9 +28,15 @@ public class SceneSwitcher : MonoBehaviour
         SceneManager.LoadScene("ChatBotScene");
 
     }
+
     public void LoadMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void LoadMarkerBasedTutorial()
+    {
+        SceneManager.LoadScene("MarkerBasedTutorial");
     }
 }
 
