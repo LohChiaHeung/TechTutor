@@ -26,6 +26,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MarkerBasedTutorial.unity
     guid: 8cf87311d5fd2f44c9a9fce21a460248
+  - enabled: 1
+    path: Assets/Scenes/FAQScene.unity
+    guid: 6993a50d1903afa47ba79a6b79f13b74
+  - enabled: 1
+    path: Assets/Scenes/SupportScene.unity
+    guid: 0d37c2e6111948f41823a402f6a3d153
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ecf4052a9f1ec244d93fe8ebf16fa90c, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 2e6b3472f17580248a081feae748b2fb, type: 2}

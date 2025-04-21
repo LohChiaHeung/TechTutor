@@ -38,6 +38,16 @@ public class SceneSwitcher : MonoBehaviour
     {
         SceneManager.LoadScene("MarkerBasedTutorial");
     }
+
+    public void LoadFAQScene()
+    {
+        SceneManager.LoadScene("FAQScene");
+    }
+
+    public void LoadChatSupportMainScene()
+    {
+        SceneManager.LoadScene("SupportScene");
+    }
 }
 
 
