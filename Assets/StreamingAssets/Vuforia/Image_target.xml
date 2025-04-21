@@ -2,5 +2,26 @@
 <QCARConfig>
   <Tracking>
     <ImageTarget name="cpu_pic" size="10.000000 10.346232" />
+    <ImageTarget name="laptop_pic_db" size="10.000000 7.148337" />
+    <ImageTarget name="speaker_createdown" size="10.000000 6.002475" />
+    <ImageTarget name="mouse_pic" size="10.000000 15.368421" />
+    <ImageTarget name="keyboard_qr_marker" size="15.000000 7.124431" />
+    <ImageTarget name="laptop2_qr_marker" size="15.000000 11.750681" />
+    <ImageTarget name="laptop_qr_marker" size="15.000000 12.102273" />
+    <ImageTarget name="microsoftword_part2_homep2" size="1.000000 0.556617" />
+    <ImageTarget name="microsoftword_part2_home" size="1.000000 0.257888" />
+    <ImageTarget name="microsoftword_part1_pic" size="1.000000 0.470000" />
+    <ImageTarget name="calculator_image" size="1.000000 1.671717" />
+    <ImageTarget name="laptop2_test" size="1.000000 0.522656" />
+    <ImageTarget name="laptop1_pic_cropped2_latest" size="1.000000 0.620609" />
+    <ImageTarget name="laptop1_featureoptimized_crop" size="1.000000 0.384746" />
+    <ImageTarget name="laptop1_pic_cropped2" size="1.000000 0.617969" />
+    <ImageTarget name="gmailtemplate" size="1.000000 0.938307" />
+    <ImageTarget name="keyboard3" size="1.000000 0.694531" />
+    <ImageTarget name="keyboard2" size="1.000000 0.613281" />
+    <ImageTarget name="keyboard" size="10.000000 5.898438" />
+    <ImageTarget name="screenshot-mockupdesign9" size="1.000000 0.880266" />
+    <ImageTarget name="laptop2" size="1.000000 0.750000" />
+    <ImageTarget name="laptop" size="1.000000 0.750000" />
   </Tracking>
 </QCARConfig>
