@@ -4406,8 +4406,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Rotate Your Phone to Enjoy the Best Experience!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
+  m_sharedMaterial: {fileID: -1219131019191153665, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4467,7 +4467,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -2.8754883, y: 78.92621, z: -105.905426, w: 53.441025}
+  m_margin: {x: 57.817993, y: 78.92621, z: -59.217926, w: 53.441025}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -4727,7 +4727,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -266, y: -39}
+  m_AnchoredPosition: {x: -294, y: -39}
   m_SizeDelta: {x: 1092.27, y: 387.88}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &720156713
@@ -4752,8 +4752,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Point your phone to the calculator.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
+  m_sharedMaterial: {fileID: -1219131019191153665, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6800,7 +6800,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2049010817}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadMainMenu
+        m_MethodName: LoadARGuideMainScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8892,7 +8892,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: -203}
+  m_AnchoredPosition: {x: 8, y: -296}
   m_SizeDelta: {x: 300.7024, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1500722060

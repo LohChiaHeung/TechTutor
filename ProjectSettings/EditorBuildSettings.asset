@@ -38,6 +38,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/DevelopmentPhaseScene.unity
     guid: 0592432ce9d1b08499b4264baee9df59
+  - enabled: 1
+    path: Assets/Scenes/ARGuide_Scene.unity
+    guid: f222a8778af85ea4e8f6ec4619a87ade
+  - enabled: 1
+    path: Assets/Scenes/ARLearn_Scene.unity
+    guid: 399e7e1099ef7544aa1f7eb825cf5a04
+  - enabled: 1
+    path: Assets/Scenes/AIChatbot_Scene.unity
+    guid: 562e750450ba60141a394b6b95b423e4
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ecf4052a9f1ec244d93fe8ebf16fa90c, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 2e6b3472f17580248a081feae748b2fb, type: 2}

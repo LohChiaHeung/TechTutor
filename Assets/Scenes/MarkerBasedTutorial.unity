@@ -2505,7 +2505,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 742811427}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadMainMenu
+        m_MethodName: LoadARLearnMainScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

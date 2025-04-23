@@ -3920,7 +3920,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 684751661}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.17965126
+  m_Size: 0.3892444
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4893,7 +4893,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1336942161}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadChatSupportMainScene
+        m_MethodName: LoadAIChatBotMainScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

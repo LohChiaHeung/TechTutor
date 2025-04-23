@@ -58,6 +58,21 @@ public class SceneSwitcher : MonoBehaviour
     {
         SceneManager.LoadScene("DevelopmentPhaseScene");
     }
+
+    public void LoadARGuideMainScene()
+    {
+        SceneManager.LoadScene("ARGuide_Scene");
+    }
+
+    public void LoadARLearnMainScene()
+    {
+        SceneManager.LoadScene("ARLearn_Scene");
+    }
+
+    public void LoadAIChatBotMainScene()
+    {
+        SceneManager.LoadScene("AIChatbot_Scene");
+    }
 }
 
 
