@@ -48,6 +48,16 @@ public class SceneSwitcher : MonoBehaviour
     {
         SceneManager.LoadScene("SupportScene");
     }
+
+    public void LoadMainScene()
+    {
+        SceneManager.LoadScene("Main_Scene");
+    }
+
+    public void LoadDevelopmentScene()
+    {
+        SceneManager.LoadScene("DevelopmentPhaseScene");
+    }
 }
 
 
