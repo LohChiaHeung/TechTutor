@@ -73,6 +73,16 @@ public class SceneSwitcher : MonoBehaviour
     {
         SceneManager.LoadScene("AIChatbot_Scene");
     }
+
+    public void LoadVirtualAssemblyScene()
+    {
+        SceneManager.LoadScene("VirtualAssemblyScene");
+    }
+
+    public void LoadStepTestScene()
+    {
+        SceneManager.LoadScene("SnapTestScene");
+    }
 }
 
 

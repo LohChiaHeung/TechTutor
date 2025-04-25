@@ -76,4 +76,6 @@ public class ARStepManager : MonoBehaviour
         //VuforiaApplication.Instance.Deinit();  
         SceneManager.LoadScene("MainMenu"); 
     }
+
+
 }
