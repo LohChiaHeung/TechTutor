@@ -26,8 +26,11 @@ public class SceneOrientationManager : MonoBehaviour
             case "ComputerComponent":
             case "CalculatorTutorial":
             case "MicrosoftWordTutorial":
-            case "MarkerBasedTutorial":
                 SetAutoRotate(); 
+                break;
+
+            case "MarkerBasedTutorial":
+                SetLandscapeOnly();
                 break;
 
             default:
