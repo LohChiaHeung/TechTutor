@@ -23,13 +23,14 @@ public class SceneOrientationManager : MonoBehaviour
                 break;
 
             case "SendEmailScene":
-            case "ComputerComponent":
             case "CalculatorTutorial":
             case "MicrosoftWordTutorial":
                 SetAutoRotate(); 
                 break;
 
             case "MarkerBasedTutorial":
+            case "ComputerComponent":
+            case "VirtualAssemblyScene":
                 SetLandscapeOnly();
                 break;
 
