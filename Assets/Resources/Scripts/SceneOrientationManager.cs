@@ -31,6 +31,10 @@ public class SceneOrientationManager : MonoBehaviour
             case "MarkerBasedTutorial":
             case "ComputerComponent":
             case "VirtualAssemblyScene":
+            case "Keyboard_Test":
+            case "SnapshotARScene":
+            case "OnlyKeyboard":
+            case "AR_Keyboard_Tutorial":
                 SetLandscapeOnly();
                 break;
 

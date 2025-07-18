@@ -84,6 +84,18 @@ public class SceneSwitcher : MonoBehaviour
     {
         SceneManager.LoadScene("SnapTestScene");
     }
+
+    public void LoadKeyboardDetection()
+    {
+        SceneManager.LoadScene("Keyboard_Test");
+    }
+
+    public void LoadKeyboardDetections()
+    {
+        //SceneManager.LoadScene("AR_Keyboard_Tutorial");
+
+        SceneManager.LoadScene("OnlyKeyboard");
+    }
 }
 
 
