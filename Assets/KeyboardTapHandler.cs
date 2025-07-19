@@ -139,37 +139,4 @@ public class KeyboardTapHandler : MonoBehaviour
             textMesh.color = new Color(1f, 1f, 1f, 1f); // white, fully opaque
         }
     }
-
-
-    IEnumerator FadeInText(TextMeshProUGUI tmp, float duration)
-    {
-        Color color = tmp.color;
-        float time = 0;
-
-        while (time < duration)
-        {
-            float t = time / duration;
-            tmp.color = new Color(color.r, color.g, color.b, t);
-            time += Time.deltaTime;
-            yield return null;
-        }
-
-        tmp.color = new Color(color.r, color.g, color.b, 1f);
-    }
-
-    IEnumerator FadeInImage(Image img, float duration)
-    {
-        Color color = img.color;
-        float time = 0;
-
-        while (time < duration)
-        {
-            float t = time / duration;
-            img.color = new Color(color.r, color.g, color.b, t);
-            time += Time.deltaTime;
-            yield return null;
-        }
-
-        img.color = new Color(color.r, color.g, color.b, 1f);
-    }
 }
