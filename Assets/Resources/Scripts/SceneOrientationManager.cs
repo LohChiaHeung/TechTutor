@@ -35,6 +35,7 @@ public class SceneOrientationManager : MonoBehaviour
             case "SnapshotARScene":
             case "OnlyKeyboard":
             case "AR_Keyboard_Tutorial":
+            case "TestVoiceToSpeech":
                 SetLandscapeOnly();
                 break;
 

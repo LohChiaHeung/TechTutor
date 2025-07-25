@@ -231,6 +231,250 @@
 //    }
 //}
 
+//using UnityEngine;
+//using Unity.Barracuda;
+//using UnityEngine.UI;
+//using System.Collections.Generic;
+//using UnityEngine.SceneManagement;
+
+//public class YoloKeyboardDetector : MonoBehaviour
+//{
+//    [Header("YOLO Models")]
+//    public NNModel keyboardModel;         // Model 1: Keyboard-only
+//    public NNModel multiClassModel;       // Model 2: All 5 classes
+//    public float confidenceThreshold = 0.55f;
+
+//    [Header("Component Panels")]
+//    public GameObject keyboardPanel;
+//    public GameObject monitorPanel;
+//    public GameObject mousePanel;
+//    public GameObject speakerPanel;
+//    public GameObject laptopPanel;
+
+//    [Header("UI")]
+//    public RawImage cameraDisplay;
+
+//    [Header("Detection Settings")]
+//    public float detectionInterval = 0.5f;
+
+//    private IWorker keyboardWorker;
+//    private IWorker multiWorker;
+//    private WebCamTexture webcam;
+//    private float detectionTimer = 0f;
+//    private const int INPUT_SIZE = 416;
+//    private Dictionary<int, GameObject> panelByClass;
+
+//    void Start()
+//    {
+//        // Load models
+//        keyboardWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, ModelLoader.Load(keyboardModel));
+//        multiWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, ModelLoader.Load(multiClassModel));
+//        Debug.Log("✅ Both models loaded.");
+
+//        // Start webcam
+//        WebCamDevice[] devices = WebCamTexture.devices;
+//        if (devices.Length == 0)
+//        {
+//            Debug.LogError("❌ No webcam found.");
+//            return;
+//        }
+
+//        webcam = new WebCamTexture(devices[0].name, 1280, 720);
+//        webcam.Play();
+//        cameraDisplay.texture = webcam;
+
+//        foreach (var panel in panelByClass.Values)
+//            panel.SetActive(false);
+//    }
+
+//    void Awake()
+//    {
+//        panelByClass = new Dictionary<int, GameObject>
+//    {
+//        { 0, mousePanel },
+//        { 1, keyboardPanel },
+//        { 2, monitorPanel },
+//        { 3, speakerPanel },
+//        { 4, laptopPanel }
+//    };
+//    }
+//    void Update()
+//    {
+//        if (webcam == null || !webcam.didUpdateThisFrame) return;
+
+//        detectionTimer += Time.deltaTime;
+//        if (detectionTimer < detectionInterval) return;
+//        detectionTimer = 0f;
+
+//        Texture2D frame = new Texture2D(webcam.width, webcam.height);
+//        frame.SetPixels(webcam.GetPixels());
+//        frame.Apply();
+
+//        Texture2D resized = ResizeTexture(frame, INPUT_SIZE, INPUT_SIZE);
+//        Tensor input = new Tensor(resized, 3);
+
+//        keyboardWorker.Execute(new Dictionary<string, Tensor> { { "images", input } });
+//        Tensor kbOutput = keyboardWorker.PeekOutput("output0");
+//        List<YoloBox> kbDetections = ParseKeyboardDetections(kbOutput);
+
+//        multiWorker.Execute(new Dictionary<string, Tensor> { { "images", input } });
+//        Tensor multiOutput = multiWorker.PeekOutput("output0");
+//        List<YoloBox> multiDetections = ParseMultiDetections(multiOutput);
+
+//        // Step 1: Hide all panels
+//        foreach (var panel in panelByClass.Values)
+//            panel.SetActive(false);
+
+//        // Step 2: Show panels based on detections
+//        // Step 2: Determine the most confident detection
+//        YoloBox topDetection = null;
+
+//        // Include keyboard from model 1 (classId = 1)
+//        if (kbDetections.Count > 0)
+//        {
+//            topDetection = new YoloBox { confidence = kbDetections[0].confidence, classId = 1 };
+//            Debug.Log("✅ Keyboard detected from Model 1");
+//        }
+
+//        // Check all detections from model 2
+//        foreach (var box in multiDetections)
+//        {
+//            if (topDetection == null || box.confidence > topDetection.confidence)
+//            {
+//                topDetection = box;
+//            }
+//        }
+
+//        // Step 3: Show only the top detection panel
+//        if (topDetection != null && topDetection.confidence >= confidenceThreshold && panelByClass.ContainsKey(topDetection.classId))
+//        {
+//            panelByClass[topDetection.classId].SetActive(true);
+//            string name = GetClassName(topDetection.classId);
+//            Debug.Log($"⭐ Showing panel: {name} (classId: {topDetection.classId}) with confidence: {topDetection.confidence:F2}");
+//        }
+//        else
+//        {
+//            Debug.Log("❌ No confident detection found.");
+//        }
+
+//        // Cleanup
+//        input.Dispose();
+//        kbOutput.Dispose();
+//        multiOutput.Dispose();
+//        Destroy(frame);
+//        Destroy(resized);
+//    }
+
+
+
+//    private string GetClassName(int classId)
+//    {
+//        switch (classId)
+//        {
+//            case 0: return "Mouse";
+//            case 1: return "Keyboard";
+//            case 2: return "Monitor";
+//            case 3: return "Speaker";
+//            case 4: return "Laptop";
+//            default: return "Unknown";
+//        }
+//    }
+
+//    //Links to the AR Tutorial
+//    public void OnKeyboardTutorialButtonClicked() => SceneManager.LoadScene("AR_Keyboard_Tutorial");
+//    public void OnMonitorTutorialButtonClicked() => SceneManager.LoadScene("AR_Monitor_Tutorial");
+//    public void OnMouseTutorialButtonClicked() => SceneManager.LoadScene("AR_Mouse_Tutorial");
+//    public void OnSpeakerTutorialButtonClicked() => SceneManager.LoadScene("AR_Speaker_Tutorial");
+//    public void OnLaptopTutorialButtonClicked() => SceneManager.LoadScene("AR_Laptop_Tutorial");
+
+//    private List<YoloBox> ParseKeyboardDetections(Tensor output)
+//    {
+//        List<YoloBox> boxes = new List<YoloBox>();
+//        int numBoxes = output.shape.channels;
+
+//        for (int i = 0; i < numBoxes; i++)
+//        {
+//            float objConf = Sigmoid(output[0, 0, 4, i]);
+//            float classConf = Sigmoid(output[0, 0, 5, i]);
+//            float finalConf = objConf * classConf;
+
+//            if (finalConf > confidenceThreshold)
+//            {
+//                boxes.Add(new YoloBox { confidence = finalConf, classId = 1 });
+//            }
+//        }
+//        return boxes;
+//    }
+
+//    private List<YoloBox> ParseMultiDetections(Tensor output)
+//    {
+//        List<YoloBox> boxes = new List<YoloBox>();
+//        int numBoxes = output.shape.channels;
+//        int numAttributes = output.shape.width; // x,y,w,h,obj + classes
+
+//        for (int i = 0; i < numBoxes; i++)
+//        {
+//            float objConf = Sigmoid(output[0, 0, 4, i]);
+
+//            float maxClassConf = 0f;
+//            int maxClassIdx = -1;
+
+//            for (int c = 5; c < numAttributes; c++)
+//            {
+//                float classConf = Sigmoid(output[0, 0, c, i]);
+//                if (classConf > maxClassConf)
+//                {
+//                    maxClassConf = classConf;
+//                    maxClassIdx = c - 5;
+//                }
+//            }
+
+//            float finalConf = objConf * maxClassConf;
+//            if (finalConf > confidenceThreshold)
+//            {
+//                boxes.Add(new YoloBox
+//                {
+//                    confidence = finalConf,
+//                    classId = maxClassIdx
+//                });
+//            }
+//        }
+
+//        return boxes;
+//    }
+
+//    private Texture2D ResizeTexture(Texture2D tex, int width, int height)
+//    {
+//        RenderTexture rt = RenderTexture.GetTemporary(width, height);
+//        Graphics.Blit(tex, rt);
+//        RenderTexture.active = rt;
+//        Texture2D result = new Texture2D(width, height, TextureFormat.RGB24, false);
+//        result.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+//        result.Apply();
+//        RenderTexture.active = null;
+//        RenderTexture.ReleaseTemporary(rt);
+//        return result;
+//    }
+
+//    private float Sigmoid(float x)
+//    {
+//        return 1f / (1f + Mathf.Exp(-x));
+//    }
+
+//    [System.Serializable]
+//    public class YoloBox
+//    {
+//        public float confidence;
+//        public int classId;
+//    }
+
+//    void OnDestroy()
+//    {
+//        keyboardWorker?.Dispose();
+//        multiWorker?.Dispose();
+//    }
+//}
+
 using UnityEngine;
 using Unity.Barracuda;
 using UnityEngine.UI;
@@ -239,30 +483,37 @@ using UnityEngine.SceneManagement;
 
 public class YoloKeyboardDetector : MonoBehaviour
 {
-    [Header("YOLO Model")]
-    public NNModel onnxModel;
-    public float confidenceThreshold = 0.5f;
+    [Header("YOLO Models")]
+    public NNModel keyboardModel;         // Model 1: Keyboard-only
+    public NNModel multiClassModel;       // Model 2: All 5 classes
+    public float confidenceThreshold = 0.55f;
+
+    [Header("Component Panels")]
+    public GameObject keyboardPanel;
+    public GameObject monitorPanel;
+    public GameObject mousePanel;
+    public GameObject speakerPanel;
+    public GameObject laptopPanel;
 
     [Header("UI")]
     public RawImage cameraDisplay;
-    public GameObject keyboardDetectedPanel;
 
     [Header("Detection Settings")]
     public float detectionInterval = 0.5f;
 
-    private Model model;
-    private IWorker worker;
+    private IWorker keyboardWorker;
+    private IWorker multiWorker;
     private WebCamTexture webcam;
     private float detectionTimer = 0f;
-    private bool hasSwitchedScene = false;
-
     private const int INPUT_SIZE = 416;
+    private Dictionary<int, GameObject> panelByClass;
 
     void Start()
     {
-        // Load YOLO model
-        model = ModelLoader.Load(onnxModel);
-        worker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, model);
+        // Load models
+        keyboardWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, ModelLoader.Load(keyboardModel));
+        multiWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, ModelLoader.Load(multiClassModel));
+        Debug.Log("✅ Both models loaded.");
 
         // Start webcam
         WebCamDevice[] devices = WebCamTexture.devices;
@@ -272,97 +523,229 @@ public class YoloKeyboardDetector : MonoBehaviour
             return;
         }
 
-        string camName = devices[0].name;
-        webcam = new WebCamTexture(camName, 1280, 720);
+        webcam = new WebCamTexture(devices[0].name, 1280, 720);
         webcam.Play();
-
-        // Display original camera feed (full res)
         cameraDisplay.texture = webcam;
 
-        keyboardDetectedPanel.SetActive(false);
+        foreach (var panel in panelByClass.Values)
+            panel.SetActive(false);
     }
 
+    void Awake()
+    {
+        panelByClass = new Dictionary<int, GameObject>
+    {
+        { 0, mousePanel },
+        { 1, keyboardPanel },
+        { 2, monitorPanel },
+        { 3, speakerPanel },
+        { 4, laptopPanel }
+    };
+    }
     void Update()
     {
-        if (webcam == null || !webcam.didUpdateThisFrame)
-            return;
+        if (webcam == null || !webcam.didUpdateThisFrame) return;
 
         detectionTimer += Time.deltaTime;
-        if (detectionTimer < detectionInterval)
-            return;
-
+        if (detectionTimer < detectionInterval) return;
         detectionTimer = 0f;
 
-        // Grab current camera frame
-        Texture2D frame = new Texture2D(webcam.width, webcam.height);
-        frame.SetPixels(webcam.GetPixels());
-        frame.Apply();
+        // 📸 Capture full frame from webcam
+        Texture2D fullFrame = new Texture2D(webcam.width, webcam.height);
+        fullFrame.SetPixels(webcam.GetPixels());
+        fullFrame.Apply();
 
-        // Resize only for inference
-        Texture2D resized = ResizeTexture(frame, INPUT_SIZE, INPUT_SIZE);
-        Tensor inputTensor = new Tensor(resized, 3);
+        // ✂️ Crop a 416x416 region from the center
+        int cropSize = INPUT_SIZE;
+        int startX = (webcam.width - cropSize) / 2;
+        int startY = (webcam.height - cropSize) / 2;
 
-        worker.Execute(new Dictionary<string, Tensor>
+        Color[] croppedPixels = fullFrame.GetPixels(startX, startY, cropSize, cropSize);
+        Texture2D croppedFrame = new Texture2D(cropSize, cropSize);
+        croppedFrame.SetPixels(croppedPixels);
+        croppedFrame.Apply();
+
+        // ✅ Use Barracuda's built-in tensor creation (handles normalization)
+        Tensor input = new Tensor(croppedFrame, 3);
+
+        // 🔁 Run both YOLO models
+        keyboardWorker.Execute(new Dictionary<string, Tensor> { { "images", input } });
+        Tensor kbOutput = keyboardWorker.PeekOutput("output0");
+        List<YoloBox> kbDetections = ApplyNMS(ParseKeyboardDetections(kbOutput));
+
+        multiWorker.Execute(new Dictionary<string, Tensor> { { "images", input } });
+        Tensor multiOutput = multiWorker.PeekOutput("output0");
+        List<YoloBox> multiDetections = ApplyNMS(ParseMultiDetections(multiOutput));
+
+
+        // 🧼 Step 1: Hide all panels
+        foreach (var panel in panelByClass.Values)
+            panel.SetActive(false);
+
+        // 🧠 Step 2: Pick top detection
+        YoloBox topDetection = null;
+        if (kbDetections.Count > 0)
         {
-            { "images", inputTensor }
-        });
+            topDetection = new YoloBox { confidence = kbDetections[0].confidence, classId = 1 };
+            Debug.Log("✅ Keyboard detected from Model 1");
+        }
 
-        Tensor output = worker.PeekOutput("output0");
-
-        var boxes = ParseDetections(output);
-
-        bool detected = boxes.Count > 0;
-        keyboardDetectedPanel.SetActive(detected);
-
-        if (detected)
+        foreach (var box in multiDetections)
         {
-            Debug.Log("✅ It is a keyboard!");
+            if (topDetection == null || box.confidence > topDetection.confidence)
+            {
+                topDetection = box;
+            }
+        }
+
+        // ⭐ Step 3: Show best panel
+        if (topDetection != null && topDetection.confidence >= confidenceThreshold && panelByClass.ContainsKey(topDetection.classId))
+        {
+            panelByClass[topDetection.classId].SetActive(true);
+            string name = GetClassName(topDetection.classId);
+            Debug.Log($"⭐ Showing panel: {name} (classId: {topDetection.classId}) with confidence: {topDetection.confidence:F2}");
         }
         else
         {
-            Debug.Log("❌ No keyboard detected.");
+            Debug.Log("❌ No confident detection found.");
         }
 
-        inputTensor.Dispose();
-        output.Dispose();
-        Destroy(frame);
-        Destroy(resized);
+        // 🧹 Cleanup
+        input.Dispose();
+        kbOutput.Dispose();
+        multiOutput.Dispose();
+        Destroy(fullFrame);
+        Destroy(croppedFrame);
     }
 
-    public void OnKeyboardTutorialButtonClicked()
+
+
+
+
+    private string GetClassName(int classId)
     {
-        SceneManager.LoadScene("AR_Keyboard_Tutorial");
+        switch (classId)
+        {
+            case 0: return "Mouse";
+            case 1: return "Keyboard";
+            case 2: return "Monitor";
+            case 3: return "Speaker";
+            case 4: return "Laptop";
+            default: return "Unknown";
+        }
     }
 
+    //Links to the AR Tutorial
+    public void OnKeyboardTutorialButtonClicked() => SceneManager.LoadScene("AR_Keyboard_Tutorial");
+    public void OnMonitorTutorialButtonClicked() => SceneManager.LoadScene("AR_Monitor_Tutorial");
+    public void OnMouseTutorialButtonClicked() => SceneManager.LoadScene("AR_Mouse_Tutorial");
+    public void OnSpeakerTutorialButtonClicked() => SceneManager.LoadScene("AR_Speaker_Tutorial");
+    public void OnLaptopTutorialButtonClicked() => SceneManager.LoadScene("AR_Laptop_Tutorial");
 
-    private List<YoloBox> ParseDetections(Tensor output)
+    private List<YoloBox> ParseKeyboardDetections(Tensor output)
     {
         List<YoloBox> boxes = new List<YoloBox>();
-
         int numBoxes = output.shape.channels;
-        int numAttributes = output.shape.width;
 
         for (int i = 0; i < numBoxes; i++)
         {
-            float x_raw = output[0, 0, 0, i];
-            float y_raw = output[0, 0, 1, i];
-            float w_raw = output[0, 0, 2, i];
-            float h_raw = output[0, 0, 3, i];
             float objConf = Sigmoid(output[0, 0, 4, i]);
-
             float classConf = Sigmoid(output[0, 0, 5, i]);
             float finalConf = objConf * classConf;
 
             if (finalConf > confidenceThreshold)
             {
-                boxes.Add(new YoloBox
-                {
-                    confidence = finalConf
-                });
+                boxes.Add(new YoloBox { confidence = finalConf, classId = 1 });
             }
         }
         return boxes;
     }
+
+    //private List<YoloBox> ParseMultiDetections(Tensor output)
+    //{
+    //    List<YoloBox> boxes = new List<YoloBox>();
+    //    int numBoxes = output.shape.channels;
+    //    int numAttributes = output.shape.width; // x,y,w,h,obj + classes
+
+    //    for (int i = 0; i < numBoxes; i++)
+    //    {
+    //        float objConf = Sigmoid(output[0, 0, 4, i]);
+
+    //        float maxClassConf = 0f;
+    //        int maxClassIdx = -1;
+
+    //        for (int c = 5; c < numAttributes; c++)
+    //        {
+    //            float classConf = Sigmoid(output[0, 0, c, i]);
+    //            if (classConf > maxClassConf)
+    //            {
+    //                maxClassConf = classConf;
+    //                maxClassIdx = c - 5;
+    //            }
+    //        }
+
+    //        float finalConf = objConf * maxClassConf;
+    //        if (finalConf > confidenceThreshold)
+    //        {
+    //            boxes.Add(new YoloBox
+    //            {
+    //                confidence = finalConf,
+    //                classId = maxClassIdx
+    //            });
+    //        }
+    //    }
+
+    //    return boxes;
+    //}
+
+    private List<YoloBox> ParseMultiDetections(Tensor output)
+    {
+        List<YoloBox> boxes = new List<YoloBox>();
+
+        int numBoxes = output.shape.channels;  // should be 8400
+        int numAttributes = output.shape.width; // should be 85
+
+        for (int i = 0; i < numBoxes; i++)
+        {
+            float x = Sigmoid(output[0, 0, 0, i]); // center x
+            float y = Sigmoid(output[0, 0, 1, i]); // center y
+            float w = Sigmoid(output[0, 0, 2, i]); // width
+            float h = Sigmoid(output[0, 0, 3, i]); // height
+
+            float objConf = Sigmoid(output[0, 0, 4, i]);
+
+            float maxClassConf = 0f;
+            int maxClassIdx = -1;
+
+            for (int c = 5; c < numAttributes; c++)
+            {
+                float classConf = Sigmoid(output[0, 0, c, i]);
+                if (classConf > maxClassConf)
+                {
+                    maxClassConf = classConf;
+                    maxClassIdx = c - 5;
+                }
+            }
+
+            float finalConf = objConf * maxClassConf;
+
+            if (finalConf > confidenceThreshold)
+            {
+                boxes.Add(new YoloBox
+                {
+                    confidence = finalConf,
+                    classId = maxClassIdx,
+                    x = x,
+                    y = y,
+                    width = w,
+                    height = h
+                });
+            }
+        }
+
+        return boxes;
+    }
+
 
     private Texture2D ResizeTexture(Texture2D tex, int width, int height)
     {
@@ -386,5 +769,36 @@ public class YoloKeyboardDetector : MonoBehaviour
     public class YoloBox
     {
         public float confidence;
+        public int classId;
+        public float x, y, width, height; // normalized (0–1)
+    }
+
+    public static List<YoloBox> ApplyNMS(List<YoloBox> boxes, float iouThreshold = 0.45f)
+    {
+        List<YoloBox> result = new List<YoloBox>();
+        boxes.Sort((a, b) => b.confidence.CompareTo(a.confidence)); // high to low
+
+        while (boxes.Count > 0)
+        {
+            YoloBox best = boxes[0];
+            result.Add(best);
+            boxes.RemoveAt(0);
+
+            boxes.RemoveAll(box => IoU(best, box) > iouThreshold);
+        }
+
+        return result;
+    }
+
+    private static float IoU(YoloBox a, YoloBox b)
+    {
+        // Simplified — assuming you decode actual boxes
+        return 0f; // Replace this with real IoU if you decode box coordinates
+    }
+
+    void OnDestroy()
+    {
+        keyboardWorker?.Dispose();
+        multiWorker?.Dispose();
     }
 }

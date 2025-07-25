@@ -11,34 +11,34 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainMenu.unity
     guid: 345a1f091deea2245a3e6f885db191a2
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/SendEmailScene.unity
     guid: 86741172bc24f2f40959d548b479e7e4
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/CalculatorTutorial.unity
     guid: 26dd4cf7cc5fccc47b4bb81ecf9a06c3
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/MicrosoftWordTutorial.unity
     guid: 50a1ec524e46f104c8249f5e080ced65
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ChatBotScene.unity
     guid: 63f6801a98746f74ca84154f48a86401
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ComputerComponent.unity
     guid: 29207cebf6c08c942a3fc46f71b09765
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/MarkerBasedTutorial.unity
     guid: 8cf87311d5fd2f44c9a9fce21a460248
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/FAQScene.unity
     guid: 6993a50d1903afa47ba79a6b79f13b74
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/SupportScene.unity
     guid: 0d37c2e6111948f41823a402f6a3d153
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/DevelopmentPhaseScene.unity
     guid: 0592432ce9d1b08499b4264baee9df59
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ARGuide_Scene.unity
     guid: f222a8778af85ea4e8f6ec4619a87ade
   - enabled: 1
@@ -47,22 +47,22 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AIChatbot_Scene.unity
     guid: 562e750450ba60141a394b6b95b423e4
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/VirtualAssemblyScene.unity
     guid: 7b52755e0ca6cee4e9c2a9b3353c634f
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/SnapTestScene.unity
     guid: 2aee84547cb14f34d8d93b27f50c9569
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/KeyboardDetection.unity
     guid: 8429089d65f033e4cac5002f1f260fa3
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Keyboard_Test.unity
     guid: bf36b13545611fa4eb2c58c8b1f7eaa1
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/SnapshotARScene.unity
     guid: 3fa137654593be04daa3c5d549b5b084
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/CameraTestScene.unity
     guid: 0b4ff9acfa9fc7f40ac55a2a3c4e3c86
   - enabled: 1
@@ -71,6 +71,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AR_Keyboard_Tutorial.unity
     guid: 8055cd5985da9ce4395854887f081014
+  - enabled: 1
+    path: Assets/Scenes/TestVoiceToSpeech.unity
+    guid: cb6c31869ce46814d8ee4b30a0d37108
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ecf4052a9f1ec244d93fe8ebf16fa90c, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 2e6b3472f17580248a081feae748b2fb, type: 2}

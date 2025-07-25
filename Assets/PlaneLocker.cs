@@ -10,8 +10,8 @@ public class PlaneLocker : MonoBehaviour
     public ARRaycastManager raycastManager;
     public ARPlaneManager planeManager;
 
-    [Header("Locked Area Prefab")]
-    public GameObject lockedAreaPrefab;
+    //[Header("Locked Area Prefab")]
+    //public GameObject lockedAreaPrefab;
 
     [Header("Confirm Button")]
     public GameObject confirmButton;
@@ -22,16 +22,21 @@ public class PlaneLocker : MonoBehaviour
     [TextArea]
     public string keyboardDescriptionText;
 
+    [Header("Preview Prefab")]
+    public GameObject keyboardPreviewPrefab;
+
+    [Header("Ghost Material")]
+    public Material ghostMaterial;
+
     [Header("AR Text Overlay Prefab")]
     public GameObject arTextCanvasPrefab;
 
-    [Header("Key Highlights")]
-    public GameObject keyHighlightGroup;
+    //[Header("Key Highlights")]
+    //public GameObject keyHighlightGroup;
 
     private ARPlane lockedPlane;
     private GameObject lockedAreaVisual;
     private GameObject keyboardInstance;
-
 
     private static List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
@@ -65,33 +70,39 @@ public class PlaneLocker : MonoBehaviour
     {
         Debug.Log("[PlaneLocker] Plane locked: " + plane.trackableId);
 
-        // Disable plane detection
         planeManager.enabled = false;
 
-        // Hide all other planes except the locked one
         foreach (var arPlane in planeManager.trackables)
         {
             if (arPlane != plane)
                 arPlane.gameObject.SetActive(false);
         }
 
-        if (lockedAreaPrefab != null)
+        if (keyboardPreviewPrefab != null)
         {
             lockedAreaVisual = Instantiate(
-                lockedAreaPrefab,
+                keyboardPreviewPrefab,
                 hitPose.position,
-                Quaternion.Euler(90, 0, 0)
+                Quaternion.identity
             );
+            lockedAreaVisual.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
-            // Set initial reasonable scale (e.g. 0.3m x 0.3m)
-            lockedAreaVisual.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            // 🔄 Make it face the camera
+            Vector3 cameraPosition = Camera.main.transform.position;
+            Vector3 lookDirection = cameraPosition - lockedAreaVisual.transform.position;
+            lookDirection.y = 0; // Optional: remove this line if you want full rotation
+            lockedAreaVisual.transform.rotation = Quaternion.LookRotation(-lookDirection);
 
-            Debug.Log("[PlaneLocker] Locked area visual spawned at: " + hitPose.position);
+            Renderer[] renderers = lockedAreaVisual.GetComponentsInChildren<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                r.material = ghostMaterial; // ✅ your semi-transparent material
+            }
+
+            lockedAreaVisual.AddComponent<AreaManipulator>();
         }
-        else
-        {
-            Debug.LogWarning("[PlaneLocker] Locked Area Prefab not assigned!");
-        }
+
+
 
         if (confirmButton != null)
         {
@@ -107,19 +118,17 @@ public class PlaneLocker : MonoBehaviour
             return;
         }
 
-        Debug.Log("[PlaneLocker] Confirming locked area...");
-
         lockedAreaReady = true;
 
         if (confirmButton != null)
             confirmButton.SetActive(false);
 
-        var manipulator = lockedAreaVisual.GetComponent<AreaManipulator>();
-        if (manipulator != null)
-        {
-            Destroy(manipulator);
-            Debug.Log("[PlaneLocker] Disabled AreaManipulator after confirmation.");
-        }
+        //var manipulator = lockedAreaVisual.GetComponent<AreaManipulator>();
+        //if (manipulator != null)
+        //{
+        //    Destroy(manipulator);
+        //    Debug.Log("[PlaneLocker] Disabled AreaManipulator after confirmation.");
+        //}
 
         lockedAreaVisual.SetActive(false);
 
@@ -132,50 +141,33 @@ public class PlaneLocker : MonoBehaviour
             Quaternion.identity
         );
 
-        // Apply extra rotation in code:
-        //keyboardInstance.transform.Rotate(-90f, 0f, 180f, Space.Self);
         keyboardInstance.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-
-        // Add manipulator for scaling/rotation
         keyboardInstance.AddComponent<KeyboardManipulator>();
 
         Debug.Log("[PlaneLocker] Keyboard instantiated at: " + spawnPosition);
 
         GameObject canvasObj = Instantiate(arTextCanvasPrefab, keyboardInstance.transform);
-        canvasObj.transform.localPosition = new Vector3(0, 2.5f, 0);
+        canvasObj.transform.localPosition = new Vector3(0, 2.5f, -2.5f);
         canvasObj.transform.localRotation = Quaternion.identity;
-        canvasObj.transform.localScale = Vector3.one * 0.01f;
-
-        //canvasObj.transform.LookAt(Camera.main.transform);
-        //canvasObj.transform.Rotate(0, 180f, 0);
+        canvasObj.transform.localScale = Vector3.one * 0.0025f;
 
         Debug.Log("[Debug] Canvas local scale: " + canvasObj.transform.localScale);
         Debug.Log("[Debug] Canvas rect size: " + canvasObj.GetComponent<RectTransform>().sizeDelta);
 
-        // Get the background panel child
         Transform backgroundPanel = canvasObj.transform.Find("BackgroundPanel");
         if (backgroundPanel == null)
         {
             Debug.LogError("[PlaneLocker] BackgroundPanel not found in ARTextCanvas prefab!");
         }
 
-
-
-        //TMPro.TextMeshProUGUI text = canvasObj.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-        //text.text = keyboardDescriptionText;
-        //text.color = new Color(1, 1, 1, 1);
-        //text.gameObject.SetActive(false);
-
-        // Assign handler
         KeyboardTapHandler tapHandler = keyboardInstance.AddComponent<KeyboardTapHandler>();
         tapHandler.descriptionAudio = keyboardDescriptionAudio;
         tapHandler.descriptionText = keyboardDescriptionText;
         tapHandler.canvasObject = canvasObj;
         tapHandler.backgroundPanelObject = backgroundPanel?.gameObject;
-        tapHandler.keyHighlightGroup = keyHighlightGroup;
-        tapHandler.keyHighlightGroup.SetActive(false);
+        //tapHandler.keyHighlightGroup = keyHighlightGroup;
+        //tapHandler.keyHighlightGroup.SetActive(false);
 
-        // Find the close button inside the canvas
         Transform closeBtnTransform = canvasObj.transform.Find("BackgroundPanel/Button_Close");
         if (closeBtnTransform == null)
         {
@@ -199,10 +191,7 @@ public class PlaneLocker : MonoBehaviour
         if (keyGroup != null)
         {
             tapHandler.keyHighlightGroup = keyGroup.gameObject;
-            keyGroup.gameObject.SetActive(false); // 👈 this is the key fix
+            keyGroup.gameObject.SetActive(false);
         }
-
-
     }
-
 }

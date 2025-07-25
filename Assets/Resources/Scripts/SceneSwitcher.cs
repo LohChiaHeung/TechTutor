@@ -96,6 +96,16 @@ public class SceneSwitcher : MonoBehaviour
 
         SceneManager.LoadScene("OnlyKeyboard");
     }
+
+    public void LoadARKeyboard_Tutorial()
+    {
+        SceneManager.LoadScene("AR_Keyboard_Tutorial");
+    }
+
+    public void TextVoiceToSpeech()
+    {
+        SceneManager.LoadScene("TestVoiceToSpeech", LoadSceneMode.Single);
+    }
 }
 
 
