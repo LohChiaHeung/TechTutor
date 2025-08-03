@@ -486,7 +486,7 @@ public class YoloKeyboardDetector : MonoBehaviour
     [Header("YOLO Models")]
     public NNModel keyboardModel;         // Model 1: Keyboard-only
     public NNModel multiClassModel;       // Model 2: All 5 classes
-    public float confidenceThreshold = 0.55f;
+    public float confidenceThreshold = 0.4f;
 
     [Header("Component Panels")]
     public GameObject keyboardPanel;
@@ -604,6 +604,7 @@ public class YoloKeyboardDetector : MonoBehaviour
             panelByClass[topDetection.classId].SetActive(true);
             string name = GetClassName(topDetection.classId);
             Debug.Log($"⭐ Showing panel: {name} (classId: {topDetection.classId}) with confidence: {topDetection.confidence:F2}");
+            Debug.Log($"   🔸 Confidence: {topDetection.confidence:F2}");
         }
         else
         {
@@ -617,9 +618,6 @@ public class YoloKeyboardDetector : MonoBehaviour
         Destroy(fullFrame);
         Destroy(croppedFrame);
     }
-
-
-
 
 
     private string GetClassName(int classId)
@@ -651,11 +649,12 @@ public class YoloKeyboardDetector : MonoBehaviour
         {
             float objConf = Sigmoid(output[0, 0, 4, i]);
             float classConf = Sigmoid(output[0, 0, 5, i]);
-            float finalConf = objConf * classConf;
+            float finalConf = objConf * 0.3f * classConf;
 
             if (finalConf > confidenceThreshold)
             {
-                boxes.Add(new YoloBox { confidence = finalConf, classId = 1 });
+                boxes.Add(new YoloBox { confidence = finalConf, classId = 1,
+                });
             }
         }
         return boxes;
@@ -738,7 +737,7 @@ public class YoloKeyboardDetector : MonoBehaviour
                     x = x,
                     y = y,
                     width = w,
-                    height = h
+                    height = h,
                 });
             }
         }

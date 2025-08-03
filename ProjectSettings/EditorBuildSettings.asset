@@ -74,7 +74,14 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestVoiceToSpeech.unity
     guid: cb6c31869ce46814d8ee4b30a0d37108
+  - enabled: 1
+    path: Assets/Scenes/AR_AllTutorial.unity
+    guid: 1fac843961355d54e94ccdb3fef751d9
+  - enabled: 1
+    path: Assets/Scenes/AR_GmailTutorial.unity
+    guid: 91ab9485578e3ba41aeb23902481ad39
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ecf4052a9f1ec244d93fe8ebf16fa90c, type: 2}
+    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 4b9f877914f7744459c8317b2b0542ef, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 2e6b3472f17580248a081feae748b2fb, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 3dfe21925bcab5a4aa024d409bc21974, type: 2}

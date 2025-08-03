@@ -13,6 +13,7 @@ public class SpeechToTextDemo : MonoBehaviour, ISpeechToTextListener
     public Sprite micOnSprite;
     public Sprite micOffSprite;
 
+    public PlaneLocker planeLocker; 
     private float normalizedVoiceLevel;
     private bool isListening = false;
 
@@ -114,20 +115,30 @@ public class SpeechToTextDemo : MonoBehaviour, ISpeechToTextListener
         {
             string cmd = spokenText.ToLower().Trim();
 
-            if (cmd.Contains("next"))
-            {
-                Debug.Log("✅ Triggered: Next Button");
-                // nextButton.onClick.Invoke();
-            }
-            else if (cmd.Contains("back"))
-            {
-                Debug.Log("✅ Triggered: Back Button");
-                // backButton.onClick.Invoke();
-            }
-            else if (cmd.Contains("keyboard"))
+            if (cmd.Contains("keyboard tutorial"))
             {
                 Debug.Log("✅ Triggered: Keyboard AR Tutorial");
-                // loadKeyboardScene();
+                planeLocker.SpawnPreviewForSelectedModel(0); // index 0 = keyboard
+            }
+            else if (cmd.Contains("mouse tutorial"))
+            {
+                Debug.Log("✅ Triggered: Mouse AR Tutorial");
+                planeLocker.SpawnPreviewForSelectedModel(1); // index 1 = mouse
+            }
+            else if (cmd.Contains("monitor tutorial")) 
+            {
+                Debug.Log("✅ Triggered: Monitor AR Tutorial");
+                planeLocker.SpawnPreviewForSelectedModel(2); // index 2 = monitor
+            }
+            else if (cmd.Contains("laptop tutorial"))
+            {
+                Debug.Log("✅ Triggered: Laptop AR Tutorial");
+                planeLocker.SpawnPreviewForSelectedModel(3); // index 2 = laptop
+            }
+            else if (cmd.Contains("speaker tutorial"))
+            {
+                Debug.Log("✅ Triggered: Speaker AR Tutorial");
+                planeLocker.SpawnPreviewForSelectedModel(4); // index 2 = speaker
             }
         }
 

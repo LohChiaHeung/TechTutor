@@ -1,45 +1,55 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class KeyboardTapHandler : MonoBehaviour
 {
-    public AudioClip descriptionAudio;
-    public string descriptionText;
+    [Header("UI & Visuals")]
     public GameObject canvasObject;
     public GameObject backgroundPanelObject; // Should be the "BackgroundPanel" GameObject
     public GameObject keyHighlightGroup;
     public Button closeButton;
-    private bool isDeactivated = false;
 
+    [Header("Audio")]
+    public AudioClip descriptionAudio;
 
     private AudioSource audioSource;
     private TextMeshProUGUI textMesh;
     private Image backgroundImage;
 
+    private bool isDeactivated = false;
+
     void Start()
     {
-        Debug.Log("[KeyboardTapHandler] backgroundImage component: " + backgroundImage);
-
-
+        // Setup audio
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
 
-        // Get references
+        // Validation checks
+        if (canvasObject == null)
+            Debug.LogError("[KeyboardTapHandler] ❌ canvasObject is NULL — not assigned!");
+        else
+            Debug.Log("[KeyboardTapHandler] ✅ canvasObject found: " + canvasObject.name + " | activeSelf: " + canvasObject.activeSelf);
+
+        if (backgroundPanelObject == null)
+            Debug.LogError("[KeyboardTapHandler] ❌ backgroundPanelObject is NULL!");
+        else
+            Debug.Log("[KeyboardTapHandler] ✅ backgroundPanel found: " + backgroundPanelObject.name);
+
         if (backgroundPanelObject != null)
         {
             textMesh = backgroundPanelObject.GetComponentInChildren<TextMeshProUGUI>();
             backgroundImage = backgroundPanelObject.GetComponent<Image>();
         }
 
-        // Hide everything initially
+        // Hide canvas initially
         if (canvasObject != null)
             canvasObject.SetActive(false);
 
         if (closeButton != null)
             closeButton.onClick.AddListener(OnCloseButtonTapped);
 
+        // Make background and text transparent
         if (backgroundImage != null)
             backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, 0f);
 
@@ -47,19 +57,15 @@ public class KeyboardTapHandler : MonoBehaviour
             textMesh.color = new Color(textMesh.color.r, textMesh.color.g, textMesh.color.b, 0f);
 
         if (backgroundPanelObject != null)
-        {
-            backgroundPanelObject.SetActive(true); // ensure it's not accidentally disabled
-            Debug.Log("[KeyboardTapHandler] Background panel set active manually at Start");
-        }
-
+            backgroundPanelObject.SetActive(true); // ensure visible when needed
     }
 
     void Update()
     {
+        if (isDeactivated) return;
+
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
-            if (isDeactivated) return;
-
             Touch touch = Input.GetTouch(0);
             Ray ray = Camera.main.ScreenPointToRay(touch.position);
 
@@ -83,7 +89,7 @@ public class KeyboardTapHandler : MonoBehaviour
 
     public void OnCloseButtonTapped()
     {
-        isDeactivated = true; // 🔐 Disallow all future taps
+        isDeactivated = true;
         Debug.Log("[KeyboardTapHandler] Close button tapped.");
 
         if (canvasObject != null)
@@ -102,7 +108,6 @@ public class KeyboardTapHandler : MonoBehaviour
             Debug.LogWarning("[KeyboardTapHandler] keyHighlightGroup is null!");
         }
 
-        // ✅ Disable this object's collider so it doesn't block future clicks
         Collider col = GetComponent<Collider>();
         if (col != null)
         {
@@ -123,20 +128,15 @@ public class KeyboardTapHandler : MonoBehaviour
 
         if (backgroundPanelObject != null)
         {
-            backgroundPanelObject.SetActive(true); // just in case
+            backgroundPanelObject.SetActive(true);
             Debug.Log("[KeyboardTapHandler] backgroundPanelObject active? " + backgroundPanelObject.activeSelf);
-        }
-        else
-        {
-            Debug.LogWarning("[KeyboardTapHandler] backgroundPanelObject is null!");
         }
 
         if (backgroundImage != null)
-            backgroundImage.color = new Color(0f, 1f, 0f, 1f); // green, fully opaque
+            backgroundImage.color = new Color(1f, 1f, 1f, 1f); // white opaque
 
         if (textMesh != null)
-        {
-            textMesh.color = new Color(1f, 1f, 1f, 1f); // white, fully opaque
-        }
+            textMesh.color = new Color(1f, 1f, 1f, 1f); // black opaque
+
     }
 }

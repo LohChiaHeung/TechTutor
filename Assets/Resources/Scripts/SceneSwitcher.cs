@@ -99,7 +99,13 @@ public class SceneSwitcher : MonoBehaviour
 
     public void LoadARKeyboard_Tutorial()
     {
-        SceneManager.LoadScene("AR_Keyboard_Tutorial");
+        //SceneManager.LoadScene("AR_Keyboard_Tutorial");
+        SceneManager.LoadScene("AR_AllTutorial");
+    }
+
+    public void LoadGmailTutorial()
+    {
+        SceneManager.LoadScene("AR_GmailTutorial", LoadSceneMode.Single);
     }
 
     public void TextVoiceToSpeech()
