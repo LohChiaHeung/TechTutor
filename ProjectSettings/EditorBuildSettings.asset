@@ -80,6 +80,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AR_GmailTutorial.unity
     guid: 91ab9485578e3ba41aeb23902481ad39
+  - enabled: 1
+    path: Assets/Scenes/AR_SnippingToolsTutorial.unity
+    guid: 8f47b377ca9ea5f47872ce02712fcd66
+  - enabled: 1
+    path: Assets/Scenes/AR_MicrosoftWordTutorial.unity
+    guid: 279147c3e6aa02c4eadb5073e6607853
+  - enabled: 1
+    path: Assets/Scenes/AR_IdentifyComputerComponents.unity
+    guid: 9e373894b4c9251479cbecdc4a9ff5fd
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ecf4052a9f1ec244d93fe8ebf16fa90c, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 4b9f877914f7744459c8317b2b0542ef, type: 2}

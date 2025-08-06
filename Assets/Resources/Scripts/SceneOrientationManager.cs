@@ -19,6 +19,9 @@ public class SceneOrientationManager : MonoBehaviour
             case "ARGuide_Scene":
             case "ARLearn_Scene":
             case "AIChatbot_Scene":
+            case "AR_MicrosoftWordTutorial":
+            case "AR_GmailTutorial":
+            case "AR_SnippingToolsTutorial":
                 SetPortraitOnly();
                 break;
 
@@ -37,7 +40,7 @@ public class SceneOrientationManager : MonoBehaviour
             case "AR_Keyboard_Tutorial":
             case "TestVoiceToSpeech":
             case "AR_AllTutorial":
-            case "AR_GmailTutorial":
+            case "AR_IdentifyComputerComponents":
                 SetLandscapeOnly();
                 break;
 

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneSwitcher : MonoBehaviour
@@ -103,10 +103,33 @@ public class SceneSwitcher : MonoBehaviour
         SceneManager.LoadScene("AR_AllTutorial");
     }
 
-    public void LoadGmailTutorial()
+    public void LoadARGmailTutorial()
     {
         SceneManager.LoadScene("AR_GmailTutorial", LoadSceneMode.Single);
     }
+
+    public void LoadARSnippingTools()
+    {
+        SceneManager.LoadScene("AR_SnippingToolsTutorial", LoadSceneMode.Single);
+    }
+
+    public void LoadARMicrosoftWordTutorial()
+    {
+        SceneManager.LoadScene("AR_MicrosoftWordTutorial", LoadSceneMode.Single);
+    }
+
+    public void LoadAR_IdentifyComputerComponent()
+    {
+        GameObject obj = GameObject.Find("DontDestroyOnLoad");
+        if (obj != null)
+        {
+            Destroy(obj);
+            Debug.Log("✅ Destroyed DontDestroyOnLoad object before scene switch.");
+        }
+
+        SceneManager.LoadScene("AR_IdentifyComputerComponents", LoadSceneMode.Single);
+    }
+
 
     public void TextVoiceToSpeech()
     {

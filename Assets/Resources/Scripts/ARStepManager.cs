@@ -75,6 +75,35 @@ public class ARStepManager : MonoBehaviour
         return currentStep;
     }
 
+    //private void ShowStep(int index)
+    //{
+    //    for (int i = 0; i < steps.Length; i++)
+    //        steps[i].SetActive(i == index);
+
+    //    if (promptForNextTarget != null)
+    //    {
+    //        promptForNextTarget.SetActive(false);
+    //        showingPrompt = false;
+    //    }
+
+    //    // ✅ Show % only between step 1 and 15
+    //    if (progressText != null)
+    //    {
+    //        if (index >= 1 && index <= 15)
+    //        {
+    //            int totalSteps = 15; // steps 1 to 15
+    //            float percent = ((float)index / totalSteps) * 100f;
+    //            progressText.text = $"{Mathf.Clamp(Mathf.RoundToInt(percent), 0, 100)}%";
+    //            progressText.gameObject.SetActive(true);
+    //        }
+    //        else
+    //        {
+    //            // Hide on welcome (0) and final (16)
+    //            progressText.gameObject.SetActive(false);
+    //        }
+    //    }
+    //}
+
     private void ShowStep(int index)
     {
         for (int i = 0; i < steps.Length; i++)
@@ -86,28 +115,33 @@ public class ARStepManager : MonoBehaviour
             showingPrompt = false;
         }
 
-        // ✅ Show % only between step 1 and 15
+        // ✅ Show % dynamically based on step count
         if (progressText != null)
         {
-            if (index >= 1 && index <= 15)
+            // Only show progress between first and last content step (not Welcome or Final)
+            int firstContentStep = 1;
+            int lastContentStep = steps.Length - 2; // Exclude welcome (0) and final (steps.Length - 1)
+
+            if (index >= firstContentStep && index <= lastContentStep)
             {
-                int totalSteps = 15; // steps 1 to 15
-                float percent = ((float)index / totalSteps) * 100f;
+                int totalContentSteps = lastContentStep - firstContentStep + 1;
+                int currentContentStep = index - firstContentStep + 1;
+
+                float percent = ((float)currentContentStep / totalContentSteps) * 100f;
                 progressText.text = $"{Mathf.Clamp(Mathf.RoundToInt(percent), 0, 100)}%";
                 progressText.gameObject.SetActive(true);
             }
             else
             {
-                // Hide on welcome (0) and final (16)
+                // Hide on welcome or final steps
                 progressText.gameObject.SetActive(false);
             }
         }
     }
 
-
     public void ReturnToMainMenu()
     {
-        Debug.Log("It is clicked.");
+        SceneManager.LoadScene("ARLearn_Scene");
     }
 
 

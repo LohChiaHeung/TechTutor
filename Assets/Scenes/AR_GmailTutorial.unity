@@ -3343,7 +3343,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b2cf1c0bffe941b47a0a758119ff61a4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2739870041fa0cb41a0950de68f151da, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7992,7 +7992,7 @@ PrefabInstance:
       objectReference: {fileID: 1159681569}
     - target: {fileID: 3210882484194081693, guid: b8f1914b9ff9499429cc4968f8067e72, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LoadARLearnMainScene
+      value: LoadARGuideMainScene
       objectReference: {fileID: 0}
     - target: {fileID: 7155360335355276033, guid: b8f1914b9ff9499429cc4968f8067e72, type: 3}
       propertyPath: m_Pivot.x
