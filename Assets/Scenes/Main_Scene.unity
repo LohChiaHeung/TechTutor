@@ -703,7 +703,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1038851643}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadDevelopmentScene
+        m_MethodName: TestSimulated
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

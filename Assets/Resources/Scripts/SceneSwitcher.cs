@@ -131,6 +131,21 @@ public class SceneSwitcher : MonoBehaviour
     }
 
 
+    public void BookFlip()
+    {
+        SceneManager.LoadScene("FlipBookTest", LoadSceneMode.Single);
+    }
+
+    public void Book3DModelFlip()
+    {
+        SceneManager.LoadScene("3DBooksModel", LoadSceneMode.Single);
+    }
+
+    public void TestSimulated()
+    {
+        SceneManager.LoadScene("AR_DeskSimulation", LoadSceneMode.Single);
+    }
+
     public void TextVoiceToSpeech()
     {
         SceneManager.LoadScene("TestVoiceToSpeech", LoadSceneMode.Single);

@@ -89,6 +89,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AR_IdentifyComputerComponents.unity
     guid: 9e373894b4c9251479cbecdc4a9ff5fd
+  - enabled: 0
+    path: Assets/Scenes/AR_BookFlip.unity
+    guid: 28da0a38be3e2d841821baff252a8227
+  - enabled: 1
+    path: Assets/Scenes/FlipBookTest.unity
+    guid: c9bb73888aa5ebe49b7cf5ae8fc904c1
+  - enabled: 1
+    path: Assets/Scenes/3DBooksModel.unity
+    guid: 1b440d545150c034591c6a0d738ef3e2
+  - enabled: 1
+    path: Assets/Scenes/AR_DeskSimulation.unity
+    guid: 2ddd234aa46ec1c42be00ee7824da26d
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ecf4052a9f1ec244d93fe8ebf16fa90c, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 4b9f877914f7744459c8317b2b0542ef, type: 2}

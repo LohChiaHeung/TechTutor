@@ -41,6 +41,9 @@ public class SceneOrientationManager : MonoBehaviour
             case "TestVoiceToSpeech":
             case "AR_AllTutorial":
             case "AR_IdentifyComputerComponents":
+            case "FlipBookTest":
+            case "3DBooksModel":
+            case "AR_DeskSimulation":
                 SetLandscapeOnly();
                 break;
 

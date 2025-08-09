@@ -1413,7 +1413,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874197}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadGmailTutorial
+        m_MethodName: BookFlip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
