@@ -18,6 +18,13 @@ public class SpeechToText_Gmail : MonoBehaviour, ISpeechToTextListener
     private float normalizedVoiceLevel;
     private bool isListening = false;
 
+    [Header("TTS Handling")]
+    public AudioSource ttsAudio;   // drag your TTS/narrator AudioSource here
+    public float resumeDelay = 0.35f; // small buffer before restarting STT
+
+    bool wasListeningBeforeTTS;
+    bool wasTTSPlaying;
+
     private void Awake()
     {
         SpeechToText.Initialize("en-US");
@@ -28,6 +35,16 @@ public class SpeechToText_Gmail : MonoBehaviour, ISpeechToTextListener
     {
         StartSpeechToTextButton.interactable = SpeechToText.IsServiceAvailable(PreferOfflineRecognition) || isListening;
         VoiceLevelSlider.value = Mathf.Lerp(VoiceLevelSlider.value, normalizedVoiceLevel, 15f * Time.unscaledDeltaTime);
+
+        // 🔍 detect TTS start/stop
+        bool ttsPlaying = ttsAudio && ttsAudio.isPlaying;
+
+        if (ttsPlaying && !wasTTSPlaying)
+            OnTTSStarted();
+        else if (!ttsPlaying && wasTTSPlaying)
+            OnTTSEnded();
+
+        wasTTSPlaying = ttsPlaying;
     }
 
     public void ToggleSpeechToText()
@@ -142,5 +159,32 @@ public class SpeechToText_Gmail : MonoBehaviour, ISpeechToTextListener
         {
             StartSpeechRecognition();
         }
+    }
+
+    void OnTTSStarted()
+    {
+        if (isListening)
+        {
+            wasListeningBeforeTTS = true;
+            StopListening(); // your existing method
+            Debug.Log("[Voice] Paused STT because TTS started.");
+        }
+        else
+        {
+            wasListeningBeforeTTS = false;
+        }
+    }
+
+    void OnTTSEnded()
+    {
+        if (wasListeningBeforeTTS)
+            StartCoroutine(ResumeSTTAfter(resumeDelay));
+        Debug.Log("[Voice] Resuming STT after TTS ended.");
+    }
+
+    IEnumerator ResumeSTTAfter(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        StartSpeechRecognition(); // your existing method
     }
 }

@@ -146,6 +146,11 @@ public class SceneSwitcher : MonoBehaviour
         SceneManager.LoadScene("AR_DeskSimulation", LoadSceneMode.Single);
     }
 
+    public void ARTutorialOverlay()
+    {
+        SceneManager.LoadScene("AR_TutorialOverlay_Demo", LoadSceneMode.Single);
+    }
+
     public void TextVoiceToSpeech()
     {
         SceneManager.LoadScene("TestVoiceToSpeech", LoadSceneMode.Single);
