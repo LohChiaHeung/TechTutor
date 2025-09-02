@@ -227,7 +227,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874199}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadMainScene
+        m_MethodName: MainScene_MainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2159,7 +2159,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874199}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadARSnippingTools
+        m_MethodName: AR_SnippingTools
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -8,6 +8,7 @@ public class MonitorManipulator : MonoBehaviour
 
     private Quaternion defaultRotation;
     private Vector3 defaultScale;
+    private Vector3 defaultPosition;
     public float rotationSpeed = 0.2f;
     public float minScale = 0.1f;
     public float maxScale = 0.3f;
@@ -16,6 +17,7 @@ public class MonitorManipulator : MonoBehaviour
     {
         defaultRotation = transform.rotation;
         defaultScale = transform.localScale;
+        defaultPosition = transform.position;
     }
     void Update()
     {
@@ -73,9 +75,19 @@ public class MonitorManipulator : MonoBehaviour
         transform.Rotate(0f, 10f, 0f, Space.Self);
     }
 
+    public void MoveUp()
+    {
+        transform.position += Vector3.up * 0.05f;
+    }
+
+    public void MoveDown()
+    {
+        transform.position += Vector3.down * 0.05f;
+    }
     public void ResetModelTransform()
     {
         transform.rotation = defaultRotation;
         transform.localScale = defaultScale;
+        transform.position = defaultPosition;
     }
 }

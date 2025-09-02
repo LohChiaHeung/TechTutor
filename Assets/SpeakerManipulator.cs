@@ -8,6 +8,7 @@ public class SpeakerManipulator : MonoBehaviour
 
     private Quaternion defaultRotation;
     private Vector3 defaultScale;
+    private Vector3 defaultPosition;
 
     public float rotationSpeed = 0.2f;
     public float minScale = 0.1f;
@@ -22,6 +23,7 @@ public class SpeakerManipulator : MonoBehaviour
         defaultRotation = transform.rotation;
         defaultScale = transform.localScale;
         currentYRotation = transform.localEulerAngles.y;
+        defaultPosition = transform.position;
     }
 
     void Update()
@@ -83,11 +85,22 @@ public class SpeakerManipulator : MonoBehaviour
         ApplyRotation();
     }
 
+    public void MoveUp()
+    {
+        transform.position += Vector3.up * 0.05f;
+    }
+
+    public void MoveDown()
+    {
+        transform.position += Vector3.down * 0.05f;
+    }
+
     public void ResetModelTransform()
     {
         transform.rotation = defaultRotation;
         transform.localScale = defaultScale;
         currentYRotation = 0f;
+        transform.position = defaultPosition;
     }
 
     private void ApplyRotation()

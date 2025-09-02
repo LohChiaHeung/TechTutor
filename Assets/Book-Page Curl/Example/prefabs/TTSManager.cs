@@ -1,5 +1,10 @@
 using System;
 using UnityEngine;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using UnityEngine.Networking;
+using System.Collections.Generic;
 
 public class TTSManager : MonoBehaviour
 {
@@ -8,6 +13,7 @@ public class TTSManager : MonoBehaviour
     [SerializeField] private TTSModel model = TTSModel.TTS_1;
     [SerializeField] private TTSVoice voice = TTSVoice.Alloy;
     [SerializeField, Range(0.25f, 4.0f)] private float speed = 1f;
+    readonly Dictionary<string, string> _knownPaths = new();
 
     private void OnEnable()
     {

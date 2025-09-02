@@ -34,6 +34,10 @@ public class OpenAIImageDescriber : MonoBehaviour
     public TextMeshProUGUI statusText;           // <- NEW: e.g. “Analyzing… Please wait”
     public CanvasGroup workingSpinner;           // <- OPTIONAL: a spinner (alpha hidden initially)
 
+    [Header("Voice / TTS")]
+    public TTSManager tts;            // Assign in Inspector
+    public Button infoVoiceButton;    // Button in Info Panel to replay voice
+
     [Header("OpenAI API")]
     [TextArea]
     public string openAIApiKey = "";             // Your GPT-4o API key
@@ -67,6 +71,8 @@ public class OpenAIImageDescriber : MonoBehaviour
         public string info;      // the paragraph(s)
         public string imagePath; // saved PNG path
         public string timeIso;   // timestamp
+        public string summaryTtsPath; // local wav/mp3 for summary voice
+        public string infoTtsPath;    // local wav/mp3 for info voice
     }
 
     private void Awake()
@@ -85,7 +91,17 @@ public class OpenAIImageDescriber : MonoBehaviour
     {
         captureButton.onClick.AddListener(() => StartCoroutine(CaptureAndSendToOpenAI()));
         moreInfoButton.onClick.AddListener(ShowInfoPanel);
-        closeButton.onClick.AddListener(() => infoPanel.SetActive(false));
+        closeButton.onClick.AddListener(() => {
+            StopLocalVoice();
+            infoPanel.SetActive(false);
+             });
+
+        if (infoVoiceButton != null)
+        {
+            infoVoiceButton.onClick.RemoveAllListeners(); // ensure single source of truth
+            infoVoiceButton.onClick.AddListener(SpeakInfoFull);
+        }
+
 
         if (historyButton != null)
             historyButton.onClick.AddListener(OpenHistory);
@@ -232,10 +248,9 @@ public class OpenAIImageDescriber : MonoBehaviour
 
             // Save preview image to disk so it persists in history
             string savedPath = SavePreviewTextureToDisk(lastPreviewTexture);
-            AddHistory(content, title, content, savedPath);
-
-            // Optional: auto-open info panel after success
-            // ShowInfoPanel();
+            var entry = AddHistory(summary, title, content, savedPath);
+            // Do NOT persist here (it plays). Let SpeakSummaryOnce() create+save+play.
+            SpeakSummaryOnce();
         }
         else
         {
@@ -246,6 +261,142 @@ public class OpenAIImageDescriber : MonoBehaviour
         SetWorking(false, "");
         DisableMainButtons(false);
     }
+
+    HistoryEntry GetEntryForLastReply()
+    {
+        ExtractTitleAndInfo(lastFullReply, out string t, out string c);
+        string s = ExtractSummaryOnly(lastFullReply);
+        foreach (var e in history)
+            if (e.title == t && e.info == c && e.summary == s) return e;
+        return history.Count > 0 ? history[0] : null;
+    }
+
+    //void SpeakInfoFull()  // plays: "This is a ___." then "<Title>. <Content>"
+    //{
+    //    if (!tts) return;
+
+    //    var entry = GetEntryForLastReply();
+    //    ExtractTitleAndInfo(lastFullReply, out string title, out string content);
+    //    string summaryPhrase = ExtractSummaryOnly(lastFullReply);
+    //    string infoPhrase = (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(content)) ? $"{title}. {content}" : title;
+
+    //    // Ensure summary file exists (usually already from capture)
+    //    if (entry != null && string.IsNullOrEmpty(entry.summaryTtsPath))
+    //        PersistVoicesFor(entry, isInfo: false, summaryPhrase);
+
+    //    // Ensure info file exists (generate on demand the first time user asks)
+    //    if (entry != null && string.IsNullOrEmpty(entry.infoTtsPath))
+    //        PersistVoicesFor(entry, isInfo: true, infoPhrase);  // this will synth+play the FIRST one we request (see below)
+
+    //    // Decide order:
+    //    StartCoroutine(PlaySummaryThenInfo(entry, summaryPhrase, infoPhrase));
+    //}
+
+    void SpeakInfoFull() // plays "<Title>. <Content>" ONLY (no "This is a …")
+    {
+        if (!tts) return;
+
+        var entry = GetEntryForLastReply();
+        ExtractTitleAndInfo(lastFullReply, out string title, out string content);
+
+        // Compose Title + Content (fallback to title if content empty)
+        string infoPhrase = (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(content))
+                            ? $"{title}. {content}"
+                            : title;
+
+        // Run the single-step sequencer; will reuse local file or synth+save if missing
+        StartCoroutine(PlayInfoOnly(entry, infoPhrase));
+    }
+
+    IEnumerator PlayInfoOnly(HistoryEntry entry, string infoPhrase)
+    {
+        // stop any current speech to avoid overlaps
+        var src = tts ? tts.GetComponentInChildren<AudioSource>() : null;
+        if (src && src.isPlaying) src.Stop();
+
+        // If we already have a file, play it
+        if (entry != null && !string.IsNullOrEmpty(entry.infoTtsPath) && File.Exists(entry.infoTtsPath))
+        {
+            PlayLocalVoice(entry.infoTtsPath);
+            yield break;
+        }
+
+        // Otherwise synthesize once, capture to .wav, save path into history, then play
+        tts.SynthesizeAndPlay(infoPhrase);
+        yield return StartCoroutine(CaptureCurrentTTSClipToFile(infoPhrase, p =>
+        {
+            if (!string.IsNullOrEmpty(p) && entry != null)
+            {
+                entry.infoTtsPath = p;
+                SaveHistoryToDisk();
+                Debug.Log("[TTS] Saved info → " + p);
+            }
+        }));
+
+        // Play the freshly saved file (defensive)
+        if (entry != null && !string.IsNullOrEmpty(entry.infoTtsPath) && File.Exists(entry.infoTtsPath))
+            PlayLocalVoice(entry.infoTtsPath);
+    }
+
+
+    IEnumerator PlaySummaryThenInfo(HistoryEntry entry, string summaryPhrase, string infoPhrase)
+    {
+        var src0 = tts ? tts.GetComponentInChildren<AudioSource>() : null;
+        if (src0 && src0.isPlaying) src0.Stop(); // prevent overlap if user taps repeatedly
+
+        // Resolve paths (may still be generating; we’ll retry briefly)
+        string summaryPath = entry?.summaryTtsPath;
+        string infoPath = entry?.infoTtsPath;
+
+        float giveUp = Time.time + 12f;
+        // Wait a short while for files to appear if they’re being created right now
+        while (Time.time < giveUp && (string.IsNullOrEmpty(summaryPath) || string.IsNullOrEmpty(infoPath)))
+        {
+            summaryPath = entry?.summaryTtsPath;
+            infoPath = entry?.infoTtsPath;
+            yield return null;
+        }
+
+        // Play summary if available, else synth+capture now
+        if (!string.IsNullOrEmpty(summaryPath) && System.IO.File.Exists(summaryPath))
+        {
+            PlayLocalVoice(summaryPath);
+            yield return WaitForCurrentClipToEnd();
+        }
+        else
+        {
+            tts.SynthesizeAndPlay(summaryPhrase);
+            yield return StartCoroutine(CaptureCurrentTTSClipToFile(summaryPhrase, p => {
+                if (!string.IsNullOrEmpty(p) && entry != null) { entry.summaryTtsPath = p; SaveHistoryToDisk(); }
+            }));
+            yield return WaitForCurrentClipToEnd();
+        }
+
+        // Play info if available, else synth+capture now
+        if (!string.IsNullOrEmpty(infoPath) && System.IO.File.Exists(infoPath))
+        {
+            PlayLocalVoice(infoPath);
+            yield return WaitForCurrentClipToEnd();
+        }
+        else
+        {
+            tts.SynthesizeAndPlay(infoPhrase);
+            yield return StartCoroutine(CaptureCurrentTTSClipToFile(infoPhrase, p => {
+                if (!string.IsNullOrEmpty(p) && entry != null) { entry.infoTtsPath = p; SaveHistoryToDisk(); }
+            }));
+            yield return WaitForCurrentClipToEnd();
+        }
+    }
+
+    IEnumerator WaitForCurrentClipToEnd()
+    {
+        var src = tts ? tts.GetComponentInChildren<AudioSource>() : null;
+        if (!src) yield break;
+        // tiny delay to allow Play() to start
+        yield return null;
+        while (src.isPlaying) yield return null;
+    }
+
 
     // ===================== INFO PANEL =====================
     void ShowInfoPanel()
@@ -263,8 +414,8 @@ public class OpenAIImageDescriber : MonoBehaviour
             infoImage.texture = lastPreviewTexture;
 
             // Fit INSIDE 305 x 250, preserving aspect
-            const float targetW = 305f;
-            const float targetH = 250f;
+            const float targetW = 400f;
+            const float targetH = 400f;
 
             float texW = lastPreviewTexture.width;
             float texH = lastPreviewTexture.height;
@@ -288,13 +439,14 @@ public class OpenAIImageDescriber : MonoBehaviour
             var rt = infoImage.rectTransform;
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, finalW);
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, finalH);
+        
         }
         else
         {
             infoImage.texture = null;
         }
+        SpeakInfoFull();
     }
-
 
 
     // ===================== HISTORY =====================
@@ -325,7 +477,7 @@ public class OpenAIImageDescriber : MonoBehaviour
 
             // Texts
             view.titleText.text = item.title;
-            view.summaryText.text = item.summary;
+            view.summaryText.text = item.info;
             view.summaryText.maxVisibleLines = 3;
 
             // time text (robust parse only)
@@ -367,13 +519,215 @@ public class OpenAIImageDescriber : MonoBehaviour
                     // Show info on top
                     ShowInfoPanel();
                     if (infoPanel) infoPanel.transform.SetAsLastSibling();
+
                 });
+            }
+
+            Canvas.ForceUpdateCanvases();
+            var rt = historyContent as RectTransform;
+            if (rt) LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+
+            var scroll = historyContent.GetComponentInParent<ScrollRect>();
+            if (scroll)
+            {
+                // snap to top (or bottom, your choice)
+                scroll.verticalNormalizedPosition = 1f;
+                scroll.vertical = true;
             }
         }
     }
 
+    void SpeakSummaryOnce()
+    {
+        if (!tts) return;
+        var phrase = ExtractSummaryOnly(lastFullReply);
+            if (string.IsNullOrEmpty(phrase)) return;
+           // Look up the most recent entry (top of list)
+        var entry = history.Count > 0 ? history[0] : null;
+            // Try to play existing file
+           if (entry != null && !string.IsNullOrEmpty(entry.summaryTtsPath) && System.IO.File.Exists(entry.summaryTtsPath))
+                {
+            Debug.Log("[TTS] Reuse summary file: " + System.IO.Path.GetFileName(entry.summaryTtsPath));
+            PlayLocalVoice(entry.summaryTtsPath);
+               }
+           else
+                {
+            Debug.Log("[TTS] Create summary voice (first time)");
+            tts.SynthesizeAndPlay(phrase);
+            StartCoroutine(CaptureCurrentTTSClipToFile(phrase, savedPath =>
+              {
+                           if (!string.IsNullOrEmpty(savedPath) && entry != null)
+                               {
+                    entry.summaryTtsPath = savedPath;
+                    SaveHistoryToDisk();
+                    Debug.Log("[TTS] Saved summary → " + savedPath);
+                                }
+              }));
+           }
+    }
 
-    void AddHistory(string summary, string title, string info, string imagePath)
+    // Where we will save files
+    string TtsDir => System.IO.Path.Combine(Application.persistentDataPath, "tts");
+    string MakeTtsPath(string text)
+    {
+        if (!System.IO.Directory.Exists(TtsDir)) System.IO.Directory.CreateDirectory(TtsDir);
+        // simple stable name
+        string safe = System.Text.RegularExpressions.Regex.Replace(text ?? "voice", "[^a-zA-Z0-9]+", "_");
+        if (safe.Length > 40) safe = safe.Substring(0, 40);
+        return System.IO.Path.Combine(TtsDir, safe + "_" + DateTime.UtcNow.ToString("HHmmssfff") + ".wav");
+    }
+
+    /// Persist the *currently playing* TTSManager AudioSource’s clip to disk.
+    /// We don’t touch TTSManager; we just read the AudioClip samples and write a WAV.
+    IEnumerator CaptureCurrentTTSClipToFile(string sourceText, Action<string> onSaved)
+    {
+        var src = tts ? tts.GetComponentInChildren<AudioSource>() : null;
+        if (!src) { Debug.LogWarning("[TTS] No AudioSource under TTSManager."); onSaved?.Invoke(null); yield break; }
+
+        AudioClip before = src.clip;
+        float giveUpAt = Time.time + 20f;
+        AudioClip clip = null;
+
+        while (Time.time < giveUpAt)
+        {
+            if (src.clip != null && src.clip != before)
+            {
+                clip = src.clip;
+                if (clip.loadState == AudioDataLoadState.Loaded || src.isPlaying) break;
+            }
+            else if (src.isPlaying && src.clip != null)
+            {
+                clip = src.clip;
+                break;
+            }
+            yield return null;
+        }
+
+        if (clip == null) { Debug.LogWarning("[TTS] AudioSource didn’t start in time; cannot capture."); onSaved?.Invoke(null); yield break; }
+        yield return null;
+
+        float[] samples = new float[clip.samples * clip.channels];
+        try { clip.GetData(samples, 0); }
+        catch (Exception e) { Debug.LogWarning("[TTS] GetData failed: " + e.Message); onSaved?.Invoke(null); yield break; }
+
+        string path = MakeTtsPath(sourceText);
+        try { WriteWav(path, samples, clip.frequency, clip.channels); Debug.Log("[TTS] Wrote WAV: " + path); onSaved?.Invoke(path); }
+        catch (Exception e) { Debug.LogError("[TTS] Write WAV failed: " + e.Message); onSaved?.Invoke(null); }
+    }
+
+
+    /// Simple WAV writer (PCM 16-bit)
+    void WriteWav(string path, float[] samples, int sampleRate, int channels)
+    {
+        using (var fs = new System.IO.FileStream(path, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+        using (var bw = new System.IO.BinaryWriter(fs))
+        {
+            int sampleCount = samples.Length;
+            int byteRate = sampleRate * channels * 2; // 16-bit
+            int subchunk2Size = sampleCount * 2;
+            bw.Write(System.Text.Encoding.ASCII.GetBytes("RIFF"));
+            bw.Write(36 + subchunk2Size);
+            bw.Write(System.Text.Encoding.ASCII.GetBytes("WAVE"));
+            bw.Write(System.Text.Encoding.ASCII.GetBytes("fmt "));
+            bw.Write(16); // PCM
+            bw.Write((short)1); // AudioFormat PCM
+            bw.Write((short)channels);
+            bw.Write(sampleRate);
+            bw.Write(byteRate);
+            bw.Write((short)(channels * 2));
+            bw.Write((short)16); // bits per sample
+            bw.Write(System.Text.Encoding.ASCII.GetBytes("data"));
+            bw.Write(subchunk2Size);
+
+            // samples float [-1,1] -> int16
+            for (int i = 0; i < sampleCount; i++)
+            {
+                short s = (short)Mathf.Clamp(Mathf.RoundToInt(samples[i] * 32767f), short.MinValue, short.MaxValue);
+                bw.Write(s);
+            }
+        }
+    }
+
+    void PersistVoicesFor(HistoryEntry entry, bool isInfo, string phrase)
+    {
+        if (!tts || string.IsNullOrWhiteSpace(phrase)) return;
+
+        var existing = isInfo ? entry.infoTtsPath : entry.summaryTtsPath;
+        if (!string.IsNullOrEmpty(existing) && File.Exists(existing))
+        {
+            Debug.Log("[TTS] Reuse existing file: " + Path.GetFileName(existing));
+            return;
+        }
+
+        Debug.Log("[TTS] Create " + (isInfo ? "info" : "summary") + " voice (first time)");
+        tts.SynthesizeAndPlay(phrase);   // use your current TTS pipeline (no TTSManager changes)
+
+        StartCoroutine(CaptureCurrentTTSClipToFile(phrase, savedPath =>
+        {
+            if (!string.IsNullOrEmpty(savedPath))
+            {
+                if (isInfo) entry.infoTtsPath = savedPath;
+                else entry.summaryTtsPath = savedPath;
+
+                SaveHistoryToDisk();
+                Debug.Log("[TTS] Saved " + (isInfo ? "info" : "summary") + " → " + savedPath);
+            }
+        }));
+    }
+
+
+
+
+    /// Play local voice file via our own temporary AudioSource (or reuse TTS’s source)
+    void PlayLocalVoice(string path)
+    {
+        StartCoroutine(PlayLocalVoice_Co(path));
+    }
+    IEnumerator PlayLocalVoice_Co(string path)
+    {
+        if (string.IsNullOrEmpty(path) || !System.IO.File.Exists(path))
+        {
+            Debug.LogWarning("[TTS] Local file missing: " + path);
+            yield break;
+        }
+        using (var req = UnityWebRequestMultimedia.GetAudioClip("file://" + path, AudioType.WAV))
+        {
+            yield return req.SendWebRequest();
+#if UNITY_2020_2_OR_NEWER
+            if (req.result != UnityWebRequest.Result.Success)
+#else
+        if (req.isNetworkError || req.isHttpError)
+#endif
+            {
+                Debug.LogWarning("[TTS] Load local clip failed: " + req.error);
+                yield break;
+            }
+            var clip = DownloadHandlerAudioClip.GetContent(req);
+            var src = tts ? tts.GetComponentInChildren<AudioSource>() : null;
+            if (!src) src = gameObject.AddComponent<AudioSource>();
+            src.Stop();
+            src.loop = false;
+            src.clip = clip;
+            src.Play();
+            Debug.Log($"[TTS] Playing local: {System.IO.Path.GetFileName(path)}  dur≈{clip.length:0.0}s");
+        }
+    }
+    void StopLocalVoice()
+    {
+        var src = tts ? tts.GetComponentInChildren<AudioSource>() : null;
+        if (src && src.isPlaying)
+        {
+            src.Stop();
+            Debug.Log("[TTS] Stopped.");
+        }
+    }
+
+    public void SpeakCurrentInfo()
+{
+        SpeakInfoFull();
+    }
+
+    HistoryEntry AddHistory(string summary, string title, string info, string imagePath)
     {
         var entry = new HistoryEntry
         {
@@ -385,6 +739,7 @@ public class OpenAIImageDescriber : MonoBehaviour
         };
         history.Insert(0, entry); // latest first
         SaveHistoryToDisk();
+        return entry;
     }
 
     void SaveHistoryToDisk()

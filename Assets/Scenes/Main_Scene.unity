@@ -635,7 +635,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &704777443
 RectTransform:
   m_ObjectHideFlags: 0
@@ -652,9 +652,9 @@ RectTransform:
   - {fileID: 824599546}
   m_Father: {fileID: 210188194}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 300, y: -722.5}
   m_SizeDelta: {x: 600, y: 155}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &704777444
@@ -1446,7 +1446,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1038851643}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadARGuideMainScene
+        m_MethodName: MainScene_ARGuide
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1786,7 +1786,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1038851643}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadAIChatBotMainScene
+        m_MethodName: MainScene_AIChatbot
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1964,7 +1964,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1038851643}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadARLearnMainScene
+        m_MethodName: MainScene_ARLearn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

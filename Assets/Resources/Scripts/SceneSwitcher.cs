@@ -30,15 +30,15 @@ public class SceneSwitcher : MonoBehaviour
 
     }
 
-    public void LoadMainMenu()
-    {
-        SceneManager.LoadScene("MainMenu");
-    }
+    //public void LoadMainMenu()
+    //{
+    //    SceneManager.LoadScene("MainMenu");
+    //}
 
-    public void LoadMarkerBasedTutorial()
-    {
-        SceneManager.LoadScene("MarkerBasedTutorial");
-    }
+    //public void LoadMarkerBasedTutorial()
+    //{
+    //    SceneManager.LoadScene("MarkerBasedTutorial");
+    //}
 
     public void LoadFAQScene()
     {
@@ -50,54 +50,54 @@ public class SceneSwitcher : MonoBehaviour
         SceneManager.LoadScene("SupportScene");
     }
 
-    public void LoadMainScene()
+    public void MainScene_MainMenu()
     {
         SceneManager.LoadScene("Main_Scene");
     }
 
-    public void LoadDevelopmentScene()
-    {
-        SceneManager.LoadScene("DevelopmentPhaseScene");
-    }
+    //public void LoadDevelopmentScene()
+    //{
+    //    SceneManager.LoadScene("DevelopmentPhaseScene");
+    //}
 
-    public void LoadARGuideMainScene()
+    public void MainScene_ARGuide()
     {
         SceneManager.LoadScene("ARGuide_Scene");
     }
 
-    public void LoadARLearnMainScene()
+    public void MainScene_ARLearn()
     {
         SceneManager.LoadScene("ARLearn_Scene");
     }
 
-    public void LoadAIChatBotMainScene()
+    public void MainScene_AIChatbot()
     {
         SceneManager.LoadScene("AIChatbot_Scene");
     }
 
-    public void LoadVirtualAssemblyScene()
-    {
-        SceneManager.LoadScene("VirtualAssemblyScene");
-    }
+    //public void LoadVirtualAssemblyScene()
+    //{
+    //    SceneManager.LoadScene("VirtualAssemblyScene");
+    //}
 
-    public void LoadStepTestScene()
-    {
-        SceneManager.LoadScene("SnapTestScene");
-    }
+    //public void LoadStepTestScene()
+    //{
+    //    SceneManager.LoadScene("SnapTestScene");
+    //}
 
-    public void LoadKeyboardDetection()
-    {
-        SceneManager.LoadScene("Keyboard_Test");
-    }
+    //public void LoadKeyboardDetection()
+    //{
+    //    SceneManager.LoadScene("Keyboard_Test");
+    //}
 
-    public void LoadKeyboardDetections()
-    {
-        //SceneManager.LoadScene("AR_Keyboard_Tutorial");
+    //public void LoadKeyboardDetections()
+    //{
+    //    //SceneManager.LoadScene("AR_Keyboard_Tutorial");
 
-        SceneManager.LoadScene("OnlyKeyboard");
-    }
+    //    SceneManager.LoadScene("OnlyKeyboard");
+    //}
 
-    public void LoadARKeyboard_Tutorial()
+    public void LoadAR_AllTutorial()
     {
         //SceneManager.LoadScene("AR_Keyboard_Tutorial");
         SceneManager.LoadScene("AR_AllTutorial");
@@ -131,17 +131,17 @@ public class SceneSwitcher : MonoBehaviour
     }
 
 
-    public void BookFlip()
-    {
-        SceneManager.LoadScene("FlipBookTest", LoadSceneMode.Single);
-    }
+    //public void BookFlip()
+    //{
+    //    SceneManager.LoadScene("FlipBookTest", LoadSceneMode.Single);
+    //}
 
-    public void Book3DModelFlip()
-    {
-        SceneManager.LoadScene("3DBooksModel", LoadSceneMode.Single);
-    }
+    //public void Book3DModelFlip()
+    //{
+    //    SceneManager.LoadScene("3DBooksModel", LoadSceneMode.Single);
+    //}
 
-    public void TestSimulated()
+    public void AR_SnippingTools()
     {
         SceneManager.LoadScene("AR_DeskSimulation", LoadSceneMode.Single);
     }
@@ -154,6 +154,16 @@ public class SceneSwitcher : MonoBehaviour
     public void TextVoiceToSpeech()
     {
         SceneManager.LoadScene("TestVoiceToSpeech", LoadSceneMode.Single);
+    }
+
+    public void AR_AI_Tutorial()
+    {
+        SceneManager.LoadScene("AR_AI_Tutorial", LoadSceneMode.Single);
+    }
+
+    public void TestCompComponenets()
+    {
+        SceneManager.LoadScene("Test_CompComponents", LoadSceneMode.Single);
     }
 }
 

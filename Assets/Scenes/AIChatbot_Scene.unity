@@ -227,7 +227,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874197}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadMainScene
+        m_MethodName: MainScene_MainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -366,7 +366,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 5.6319, y: -47.127}
+  m_AnchoredPosition: {x: 5.6319, y: 66}
   m_SizeDelta: {x: 750.4418, y: 94.2533}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &342724854
@@ -1014,7 +1014,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Speech to Text
+  m_text: AR_AI_Guide
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
   m_sharedMaterial: {fileID: -1219131019191153665, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
@@ -1303,7 +1303,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -26, y: -191}
+  m_AnchoredPosition: {x: -26, y: -104}
   m_SizeDelta: {x: 750.4418, y: 94.2533}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1269478182
@@ -1437,7 +1437,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 5.6319, y: 424}
+  m_AnchoredPosition: {x: 5.6319, y: 555}
   m_SizeDelta: {x: 651.625, y: 717.6198}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1411220466
@@ -1649,7 +1649,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.3943, y: -1085}
+  m_AnchoredPosition: {x: -1.3943, y: -856}
   m_SizeDelta: {x: 701.23, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1678461931
@@ -1698,7 +1698,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874197}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: TextVoiceToSpeech
+        m_MethodName: AR_AI_Tutorial
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1898,7 +1898,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1795511980
 RectTransform:
   m_ObjectHideFlags: 0

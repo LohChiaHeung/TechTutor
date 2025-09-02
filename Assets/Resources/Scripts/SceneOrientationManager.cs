@@ -22,6 +22,7 @@ public class SceneOrientationManager : MonoBehaviour
             case "AR_MicrosoftWordTutorial":
             case "AR_GmailTutorial":
             case "AR_SnippingToolsTutorial":
+            case "AR_AI_Tutorial":
                 SetPortraitOnly();
                 break;
 
@@ -44,6 +45,9 @@ public class SceneOrientationManager : MonoBehaviour
             case "FlipBookTest":
             case "3DBooksModel":
             case "AR_DeskSimulation":
+            case "AR_ImageTest":
+            case "AR_PanelTutorial":
+            case "Test_CompComponents":
                 SetLandscapeOnly();
                 break;
 

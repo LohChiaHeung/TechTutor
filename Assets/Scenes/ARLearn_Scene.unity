@@ -145,7 +145,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &76165747
 RectTransform:
   m_ObjectHideFlags: 0
@@ -162,9 +162,9 @@ RectTransform:
   - {fileID: 544168355}
   m_Father: {fileID: 256339912}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 350.615, y: -505}
   m_SizeDelta: {x: 701.23, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &76165748
@@ -1001,7 +1001,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874197}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadARKeyboard_Tutorial
+        m_MethodName: LoadAR_AllTutorial
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1106,7 +1106,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Basic PC Parts
+  m_text: Identify Computer Components
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
   m_sharedMaterial: {fileID: -1219131019191153665, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
@@ -1169,7 +1169,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0.001953125, w: 0}
+  m_margin: {x: 64.88875, y: 0, z: 0.001953125, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1413,7 +1413,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874197}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: BookFlip
+        m_MethodName: TestCompComponenets
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1760,7 +1760,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1682848924
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1777,9 +1777,9 @@ RectTransform:
   - {fileID: 1099533460}
   m_Father: {fileID: 256339912}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 350.615, y: -505}
   m_SizeDelta: {x: 701.23, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1682848925
@@ -1933,7 +1933,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Keyboard Symbols
+  m_text: AR Model Learning
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
   m_sharedMaterial: {fileID: -1219131019191153665, guid: 95d874a28a28c9d43a4eeef3400a50d0, type: 2}
@@ -2263,6 +2263,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 166874197}
+    - target: {fileID: 3210882484194081693, guid: b8f1914b9ff9499429cc4968f8067e72, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: MainScene_MainMenu
+      objectReference: {fileID: 0}
     - target: {fileID: 7155360335355276033, guid: b8f1914b9ff9499429cc4968f8067e72, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

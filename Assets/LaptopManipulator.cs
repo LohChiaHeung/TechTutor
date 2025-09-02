@@ -1,72 +1,4 @@
-﻿//using UnityEngine;
-
-//public class LaptopManipulator : MonoBehaviour
-//{
-//    private float initialDistance;
-//    private Vector3 initialScale;
-//    private bool isScaling = false;
-
-//    private float rotationSpeed = 0.2f;
-
-//    private Quaternion defaultRotation;
-//    private Vector3 defaultScale;
-
-//    void Start()
-//    {
-//        defaultRotation = transform.rotation;
-//        defaultScale = transform.localScale;
-//    }
-
-//    void Update()
-//    {
-//        // Pinch to scale
-//        if (Input.touchCount == 2)
-//        {
-//            Touch touch0 = Input.GetTouch(0);
-//            Touch touch1 = Input.GetTouch(1);
-
-//            if (!isScaling)
-//            {
-//                initialDistance = Vector2.Distance(touch0.position, touch1.position);
-//                initialScale = transform.localScale;
-//                isScaling = true;
-//            }
-//            else
-//            {
-//                float currentDistance = Vector2.Distance(touch0.position, touch1.position);
-//                if (Mathf.Approximately(initialDistance, 0)) return;
-
-//                float scaleFactor = currentDistance / initialDistance;
-//                transform.localScale = initialScale * scaleFactor;
-//            }
-//        }
-//        else
-//        {
-//            isScaling = false;
-//        }
-
-//        // One-finger drag to rotate
-//        if (Input.touchCount == 1)
-//        {
-//            Touch touch = Input.GetTouch(0);
-//            if (touch.phase == TouchPhase.Moved)
-//            {
-//                float rotationY = touch.deltaPosition.x * rotationSpeed;
-//                transform.Rotate(0, -rotationY, 0, Space.Self);
-//            }
-//        }
-//    }
-
-//    public void RotateLeft() => transform.Rotate(0f, -10f, 0f, Space.Self);
-//    public void RotateRight() => transform.Rotate(0f, 10f, 0f, Space.Self);
-//    public void ResetModelTransform()
-//    {
-//        transform.rotation = defaultRotation;
-//        transform.localScale = defaultScale;
-//    }
-//}
-
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LaptopManipulator : MonoBehaviour
 {
@@ -76,6 +8,7 @@ public class LaptopManipulator : MonoBehaviour
 
     private Quaternion defaultRotation;
     private Vector3 defaultScale;
+    private Vector3 defaultPosition;
 
     public float rotationSpeed = 0.2f;
     public float minScale = 0.1f;
@@ -85,6 +18,7 @@ public class LaptopManipulator : MonoBehaviour
     {
         defaultRotation = transform.rotation;
         defaultScale = transform.localScale;
+        defaultPosition = transform.position;
     }
 
     void Update()
@@ -142,9 +76,19 @@ public class LaptopManipulator : MonoBehaviour
         transform.Rotate(0f, 10f, 0f, Space.Self);
     }
 
+    public void MoveUp()
+    {
+        transform.position += Vector3.up * 0.05f;
+    }
+
+    public void MoveDown()
+    {
+        transform.position += Vector3.down * 0.05f;
+    }
     public void ResetModelTransform()
     {
         transform.rotation = defaultRotation;
         transform.localScale = defaultScale;
+        transform.position = defaultPosition;
     }
 }

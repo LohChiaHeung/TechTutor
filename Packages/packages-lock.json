@@ -31,7 +31,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.cloud.gltfast": {
-      "version": "6.12.1",
+      "version": "6.13.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -280,6 +280,20 @@
         "com.unity.xr.legacyinputhelpers": "2.1.11"
       },
       "url": "https://packages.unity.com"
+    },
+    "com.yasirkula.nativecamera": {
+      "version": "https://github.com/yasirkula/UnityNativeCamera.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "72f5ebba26c219b4c4cda202bff2f59bfdaa47f8"
+    },
+    "com.yasirkula.nativegallery": {
+      "version": "https://github.com/yasirkula/UnityNativeGallery.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "e05fc5a14fe582e4938d2597fc1401ca3fceafb0"
     },
     "com.yasirkula.speechtotext": {
       "version": "https://github.com/yasirkula/UnitySpeechToText.git",
