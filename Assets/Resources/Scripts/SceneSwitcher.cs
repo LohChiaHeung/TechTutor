@@ -165,6 +165,13 @@ public class SceneSwitcher : MonoBehaviour
     {
         SceneManager.LoadScene("Test_CompComponents", LoadSceneMode.Single);
     }
+
+    public void AR_MicrosoftWord()
+    {
+        SceneManager.LoadScene("AR_DeskSimulation_MicrosoftWord", LoadSceneMode.Single);
+    }
+
+
 }
 
 

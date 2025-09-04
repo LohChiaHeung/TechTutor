@@ -48,6 +48,7 @@ public class SceneOrientationManager : MonoBehaviour
             case "AR_ImageTest":
             case "AR_PanelTutorial":
             case "Test_CompComponents":
+            case "AR_DeskSimulation_MicrosoftWord":
                 SetLandscapeOnly();
                 break;
 

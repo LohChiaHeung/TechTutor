@@ -1166,9 +1166,9 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1134668340}
-  - {fileID: 299541388}
   - {fileID: 1479370742}
   - {fileID: 1687365174}
+  - {fileID: 299541388}
   m_Father: {fileID: 420678385}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2025,7 +2025,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874199}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadARMicrosoftWordTutorial
+        m_MethodName: AR_MicrosoftWord
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
