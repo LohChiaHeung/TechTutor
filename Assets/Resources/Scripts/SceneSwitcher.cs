@@ -141,11 +141,6 @@ public class SceneSwitcher : MonoBehaviour
     //    SceneManager.LoadScene("3DBooksModel", LoadSceneMode.Single);
     //}
 
-    public void AR_SnippingTools()
-    {
-        SceneManager.LoadScene("AR_DeskSimulation", LoadSceneMode.Single);
-    }
-
     public void ARTutorialOverlay()
     {
         SceneManager.LoadScene("AR_TutorialOverlay_Demo", LoadSceneMode.Single);
@@ -166,9 +161,17 @@ public class SceneSwitcher : MonoBehaviour
         SceneManager.LoadScene("Test_CompComponents", LoadSceneMode.Single);
     }
 
+    public void AR_SnippingTools()
+    {
+        SceneManager.LoadScene("AR_DeskSimulation", LoadSceneMode.Single);
+    }
     public void AR_MicrosoftWord()
     {
         SceneManager.LoadScene("AR_DeskSimulation_MicrosoftWord", LoadSceneMode.Single);
+    }
+    public void AR_Gmail()
+    {
+        SceneManager.LoadScene("AR_DeskSimulation_Gmail", LoadSceneMode.Single);
     }
 
 

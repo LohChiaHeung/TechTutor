@@ -44,11 +44,12 @@ public class SceneOrientationManager : MonoBehaviour
             case "AR_IdentifyComputerComponents":
             case "FlipBookTest":
             case "3DBooksModel":
-            case "AR_DeskSimulation":
             case "AR_ImageTest":
             case "AR_PanelTutorial":
             case "Test_CompComponents":
+            case "AR_DeskSimulation":
             case "AR_DeskSimulation_MicrosoftWord":
+            case "AR_DeskSimulation_Gmail":
                 SetLandscapeOnly();
                 break;
 

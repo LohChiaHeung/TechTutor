@@ -30,13 +30,13 @@ public class PanelNarration : MonoBehaviour
     {
         var parts = new List<string>(8);
 
-        Add(parts, title ? title.text : null);
-        Add(parts, subtitle ? subtitle.text : null);
-        Add(parts, description ? description.text : null);
+        Add(parts, title ? title.GetParsedText() : null);
+        Add(parts, subtitle ? subtitle.GetParsedText() : null);
+        Add(parts, description ? description.GetParsedText() : null);
 
         if (extraTextFields != null)
             foreach (var t in extraTextFields)
-                Add(parts, t ? t.text : null);
+                Add(parts, t ? t.GetParsedText() : null);
 
         if (extraStrings != null)
             foreach (var s in extraStrings)

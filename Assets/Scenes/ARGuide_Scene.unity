@@ -471,7 +471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &299541388
 RectTransform:
   m_ObjectHideFlags: 0
@@ -488,9 +488,9 @@ RectTransform:
   - {fileID: 1270892508}
   m_Father: {fileID: 654996543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 350.615, y: -751.5}
   m_SizeDelta: {x: 701.23, y: 159}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &299541389
@@ -1538,7 +1538,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 166874199}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadARGmailTutorial
+        m_MethodName: AR_Gmail
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

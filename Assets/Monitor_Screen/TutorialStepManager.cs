@@ -37,7 +37,8 @@ public class TutorialStepManager : MonoBehaviour
     public bool broadcastToStepState = true;   // <- NEW: enable/disable broadcasting
     private bool _applyingFromState = false;   // <- NEW: prevents feedback loops
 
-    bool _needsRefreshOnEnable;
+    bool _needsRefreshOnEnable; 
+    private bool _syncedOnEnable = false;
     void OnEnable() // <- NEW: listen to StepState & sync when this manager becomes active
     {
         if (StepState.I != null)
@@ -45,6 +46,7 @@ public class TutorialStepManager : MonoBehaviour
             StepState.I.OnStepChanged.AddListener(OnExternalStepChanged);
             // Immediately sync to the current step so this manager shows the right panel
             OnExternalStepChanged(StepState.I.CurrentStep);
+            _syncedOnEnable = true;
         }
     }
 
@@ -60,6 +62,12 @@ public class TutorialStepManager : MonoBehaviour
         {
             Debug.LogWarning("[TutorialStepManager] No steps assigned.");
             return;
+        }
+
+        if (_syncedOnEnable)
+        {
+            Debug.Log("[TutorialStepManager] Start() skipped ApplyStep (already synced in OnEnable).");
+            return; // ← prevents first-load double Speak
         }
 
         // If StepState exists, prefer it as the source of truth on first show
