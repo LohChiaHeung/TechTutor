@@ -174,6 +174,11 @@ public class SceneSwitcher : MonoBehaviour
         SceneManager.LoadScene("AR_DeskSimulation_Gmail", LoadSceneMode.Single);
     }
 
+    public void AR_Quiz()
+    {
+        SceneManager.LoadScene("AR_QRQuiz", LoadSceneMode.Single);
+    }
+
 
 }
 

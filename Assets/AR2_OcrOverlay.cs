@@ -117,33 +117,68 @@ public class AR2_OcrOverlay : MonoBehaviour
         return new Rect(offX, offY, w, h);
     }
 
+    // --- REPLACE THIS METHOD IN AR2_OcrOverlay.cs ---
     Rect MapOcrRectToOverlay(Rect ocrRectPx, int ocrW, int ocrH)
     {
-        var container = screenshotImage.rectTransform.rect;
+        // Get the overlay's rect (this is our drawing canvas)
+        var overlayRect = overlayLayer.rect;
 
-        // Get the actual displayed image area (accounts for aspect ratio preservation)
-        var displayedRect = GetDisplayedImageRect(ocrW, ocrH);
+        // Simple direct mapping - assume RawImage fills the entire overlay area
+        float scaleX = overlayRect.width / Mathf.Max(1f, ocrW);
+        float scaleY = overlayRect.height / Mathf.Max(1f, ocrH);
 
-        // Calculate scaling factors based on displayed image, not container
-        float sx = displayedRect.width / Mathf.Max(1, ocrW);
-        float sy = displayedRect.height / Mathf.Max(1, ocrH);
+        // Scale OCR coordinates to UI coordinates
+        float uiX = ocrRectPx.x * scaleX;
+        float uiY = ocrRectPx.y * scaleY;
+        float uiW = ocrRectPx.width * scaleX;
+        float uiH = ocrRectPx.height * scaleY;
 
-        float uiX = ocrRectPx.x * sx;
-        float uiY = ocrRectPx.y * sy;
-        float uiW = ocrRectPx.width * sx;
-        float uiH = ocrRectPx.height * sy;
+        // Handle Y-coordinate system (OCR typically uses top-left origin, UI uses bottom-left)
+        if (ocrYTopLeft)
+        {
+            // Flip Y coordinate: convert from top-left to bottom-left origin
+            uiY = overlayRect.height - uiY - uiH;
+        }
 
-        if (ocrYTopLeft) uiY = displayedRect.height - uiY - uiH;
+        // Convert from bottom-left position to center-anchored position
+        // (since your overlay uses center pivot)
+        float centerX = uiX + uiW * 0.5f;
+        float centerY = uiY + uiH * 0.5f;
 
-        // Adjust for the displayed image's position within the container
-        uiX += displayedRect.x;
-        uiY += displayedRect.y;
+        // Convert to anchoredPosition relative to overlay center
+        float ax = centerX - overlayRect.width * 0.5f;
+        float ay = centerY - overlayRect.height * 0.5f;
 
-        // Convert to centered coordinates
-        float ax = uiX + uiW * 0.5f - container.width * 0.5f;
-        float ay = uiY + uiH * 0.5f - container.height * 0.5f;
+        // Apply manual calibration nudges
+        ax += pixelNudge.x;
+        ay += pixelNudge.y;
+        uiW += sizeNudge.x;
+        uiH += sizeNudge.y;
 
         return new Rect(ax, ay, uiW, uiH);
+    }
+
+
+    // --- ADD THIS OPTIONAL CALIBRATION VISUALIZER ---
+    public void DrawCalibrationCross(int ocrW, int ocrH)
+    {
+        var corners = new[]
+        {
+        new Rect(0, 0, 120, 40),                      // TL (in OCR px, y=top if ocrYTopLeft=true)
+        new Rect(ocrW - 120, 0, 120, 40),             // TR
+        new Rect(0, ocrH - 40, 120, 40),              // BL
+        new Rect(ocrW - 120, ocrH - 40, 120, 40)      // BR
+    };
+
+        foreach (var r in corners)
+        {
+            var ui = MapOcrRectToOverlay(r, ocrW, ocrH);
+            var img = GetBox();
+            img.color = new Color(0, 0.6f, 1f, 0.25f);
+            img.rectTransform.anchoredPosition = ui.center;
+            img.rectTransform.sizeDelta = ui.size;
+            img.rectTransform.SetAsLastSibling();
+        }
     }
 
 

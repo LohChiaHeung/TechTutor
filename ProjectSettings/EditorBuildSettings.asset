@@ -98,6 +98,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AR_DeskSimulation_Gmail.unity
     guid: 94cf15ed91cb4954098b4fb4a9807baa
+  - enabled: 1
+    path: Assets/Scenes/AR_QRQuiz.unity
+    guid: 7bdf5d1e69961a943a962b1d7dbdc621
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ecf4052a9f1ec244d93fe8ebf16fa90c, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 4b9f877914f7744459c8317b2b0542ef, type: 2}

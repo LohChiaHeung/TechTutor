@@ -74,15 +74,23 @@ public class ChatHistoryList : MonoBehaviour
             row.Bind(qa, thumb);  // your existing bind
 
             // Force row to match Content width
-            var rt = row.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0f, 1f);
-            rt.anchorMax = new Vector2(1f, 1f);
-            rt.pivot = new Vector2(0.5f, 1f);
-            rt.offsetMin = new Vector2(0f, rt.offsetMin.y); // left = 0
-            rt.offsetMax = new Vector2(0f, rt.offsetMax.y); // right = 0
-            rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y); // no fixed width
+            //var rt = row.GetComponent<RectTransform>();
+            //rt.anchorMin = new Vector2(0f, 1f);
+            //rt.anchorMax = new Vector2(1f, 1f);
+            //rt.pivot = new Vector2(0.5f, 1f);
+            //rt.offsetMin = new Vector2(0f, rt.offsetMin.y); // left = 0
+            //rt.offsetMax = new Vector2(0f, rt.offsetMax.y); // right = 0
+            //rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y); // no fixed width
+            var le = row.GetComponent<LayoutElement>();
+            if (!le) le = row.gameObject.AddComponent<LayoutElement>();
+            le.minHeight = 290f;
+            le.preferredHeight = 290f;
+            le.flexibleHeight = 0f;
 
         }
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(contentRoot as RectTransform);
+
 
     }
     void OpenFullDetail(string id)

@@ -50,6 +50,7 @@ public class SceneOrientationManager : MonoBehaviour
             case "AR_DeskSimulation":
             case "AR_DeskSimulation_MicrosoftWord":
             case "AR_DeskSimulation_Gmail":
+            case "AR_QRQuiz":
                 SetLandscapeOnly();
                 break;
 

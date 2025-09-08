@@ -602,7 +602,7 @@ public class TechTutorAskUI : MonoBehaviour
         }
 
         Canvas.ForceUpdateCanvases();
-        chatScrollRect.verticalNormalizedPosition = 0f;
+        RebuildAndScrollToBottom();
     }
 
 
@@ -905,18 +905,32 @@ public class TechTutorAskUI : MonoBehaviour
         return System.Convert.ToBase64String(imageBytes);
     }
 
+    //IEnumerator TypeText(string baseText, string newText, float delay = 0.02f)
+    //{
+    //    string current = baseText;
+
+    //    for (int i = 0; i < newText.Length; i++)
+    //    {
+    //        current += newText[i];
+    //        responseText.text = current;
+
+    //        Canvas.ForceUpdateCanvases();
+    //       //chatScrollRect.verticalNormalizedPosition = 0f;
+
+    //        yield return new WaitForSeconds(delay);
+    //    }
+    //}
     IEnumerator TypeText(string baseText, string newText, float delay = 0.02f)
     {
         string current = baseText;
+        bool autoScroll = IsNearBottom();
 
         for (int i = 0; i < newText.Length; i++)
         {
             current += newText[i];
             responseText.text = current;
 
-            Canvas.ForceUpdateCanvases();
-            chatScrollRect.verticalNormalizedPosition = 0f;
-
+            if (autoScroll) RebuildAndScrollToBottom();
             yield return new WaitForSeconds(delay);
         }
     }
@@ -1232,6 +1246,20 @@ public class TechTutorAskUI : MonoBehaviour
 #endif
     }
 
+    bool IsNearBottom(float threshold = 0.1f)
+    {
+        if (!chatScrollRect || !chatScrollRect.content) return true;
+        return chatScrollRect.verticalNormalizedPosition <= threshold; // 0 = bottom
+    }
+
+    void RebuildAndScrollToBottom()
+    {
+        var content = chatScrollRect.content;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(content);
+        Canvas.ForceUpdateCanvases();
+        chatScrollRect.verticalNormalizedPosition = 0f; // bottom
+        Canvas.ForceUpdateCanvases();
+    }
 
     public void OnRemoveImageClicked()
     {
