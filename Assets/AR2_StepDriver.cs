@@ -110,7 +110,7 @@ public class AR2_StepDriver : MonoBehaviour
         overlay.Clear();
         overlay.showImageBounds = true;
         overlay.DrawImageBounds(_ocr.width, _ocr.height);
-
+        overlay.TestCoordinateMapping(_ocr.width, _ocr.height);
         if (debugDrawAll) overlay.DrawAllOcrBoxes(_ocr);
 
         _idx = 0;

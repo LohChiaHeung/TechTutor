@@ -1,28 +1,37 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class SceneSwitcher : MonoBehaviour
 {
-    
-    public void LoadEmailTutorial()
+
+    void KillPersistentEventSystems()
     {
-        SceneManager.LoadScene("SendEmailScene");
+        // Destroy EventSystems that live in DontDestroyOnLoad scene
+        foreach (var es in FindObjectsOfType<EventSystem>(true))
+            if (es.gameObject.scene.buildIndex == -1) // -1 = DontDestroyOnLoad scene
+                Destroy(es.gameObject);
     }
 
-    public void LoadComputerKeyboardComponents()
-    {
-        SceneManager.LoadScene("ComputerComponent");
-    }
+    //public void LoadEmailTutorial()
+    //{
+    //    SceneManager.LoadScene("SendEmailScene");
+    //}
+
+    //public void LoadComputerKeyboardComponents()
+    //{
+    //    SceneManager.LoadScene("ComputerComponent");
+    //}
 
     public void LoadCalculatorTutorial()
     {
         SceneManager.LoadScene("CalculatorTutorial");
     }
 
-    public void LoadMicrosoftWordTutorial()
-    {
-        SceneManager.LoadScene("MicrosoftWordTutorial");
-    }
+    //public void LoadMicrosoftWordTutorial()
+    //{
+    //    SceneManager.LoadScene("MicrosoftWordTutorial");
+    //}
 
     public void LoadChatBot()
     {
@@ -103,20 +112,21 @@ public class SceneSwitcher : MonoBehaviour
         SceneManager.LoadScene("AR_AllTutorial");
     }
 
-    public void LoadARGmailTutorial()
-    {
-        SceneManager.LoadScene("AR_GmailTutorial", LoadSceneMode.Single);
-    }
+    //public void LoadARGmailTutorial()
+    //{
+    //    SceneManager.LoadScene("AR_GmailTutorial", LoadSceneMode.Single);
+    //}
 
-    public void LoadARSnippingTools()
-    {
-        SceneManager.LoadScene("AR_SnippingToolsTutorial", LoadSceneMode.Single);
-    }
+    //public void LoadARSnippingTools()
+    //{
+    //    SceneManager.LoadScene("AR_SnippingToolsTutorial", LoadSceneMode.Single);
+    //}
 
-    public void LoadARMicrosoftWordTutorial()
-    {
-        SceneManager.LoadScene("AR_MicrosoftWordTutorial", LoadSceneMode.Single);
-    }
+    //public void LoadARMicrosoftWordTutorial()
+    //{
+    //    //SceneManager.LoadScene("AR_MicrosoftWordTutorial", LoadSceneMode.Single);
+    //    SceneManager.LoadScene("AR_PortraitMode_MsWord", LoadSceneMode.Single);
+    //}
 
     public void LoadAR_IdentifyComputerComponent()
     {
@@ -163,14 +173,24 @@ public class SceneSwitcher : MonoBehaviour
 
     public void AR_SnippingTools()
     {
+        if (StepState.I) StepState.I.CurrentStep = 0;
+        KillPersistentEventSystems();
+        KillAllDontDestroyOnLoad();
         SceneManager.LoadScene("AR_DeskSimulation", LoadSceneMode.Single);
     }
     public void AR_MicrosoftWord()
     {
-        SceneManager.LoadScene("AR_DeskSimulation_MicrosoftWord", LoadSceneMode.Single);
+        if (StepState.I) StepState.I.CurrentStep = 0;
+        KillPersistentEventSystems();
+        KillAllDontDestroyOnLoad();
+        //SceneManager.LoadScene("AR_DeskSimulation_MicrosoftWord", LoadSceneMode.Single);
+        SceneManager.LoadScene("AR_PortraitMode_MsWord", LoadSceneMode.Single);
     }
     public void AR_Gmail()
     {
+        if (StepState.I) StepState.I.CurrentStep = 0;
+        KillPersistentEventSystems();
+        KillAllDontDestroyOnLoad();
         SceneManager.LoadScene("AR_DeskSimulation_Gmail", LoadSceneMode.Single);
     }
 
@@ -179,6 +199,24 @@ public class SceneSwitcher : MonoBehaviour
         SceneManager.LoadScene("AR_QRQuiz", LoadSceneMode.Single);
     }
 
+    public void LoadOCRPlease()
+    {
+        SceneManager.LoadScene("TT2_OcrDemo", LoadSceneMode.Single);
+    }
+
+    void KillAllDontDestroyOnLoad()
+    {
+        var temp = new GameObject("TempDDOL");
+        DontDestroyOnLoad(temp);
+        var ddolScene = temp.scene;
+
+        foreach (var root in ddolScene.GetRootGameObjects())
+        {
+            if (root != temp) Destroy(root);
+        }
+
+        Destroy(temp);
+    }
 
 }
 

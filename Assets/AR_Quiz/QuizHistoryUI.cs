@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -11,6 +11,29 @@ public class QuizHistoryUI : MonoBehaviour
 
     void OnEnable() { Refresh(); }
 
+    //public void Refresh()
+    //{
+    //    foreach (Transform c in listParent) Destroy(c.gameObject);
+
+    //    var hist = QuizHistoryManager.Instance?.GetHistory();
+    //    if (hist == null) return;
+
+    //    for (int i = 0; i < hist.Count; i++)
+    //    {
+    //        var e = hist[i];
+    //        var go = Instantiate(rowPrefab, listParent);
+    //        var txt = go.GetComponentInChildren<TextMeshProUGUI>();
+    //        if (txt) txt.text = $"{e.date} | {e.modelId} | {e.score}/{e.totalQuestions}";
+
+    //        var btn = go.GetComponentInChildren<Button>();
+    //        int index = i;
+    //        if (btn) btn.onClick.AddListener(() =>
+    //        {
+    //            QuizHistorySelection.Selected = hist[index]; // pass selection
+    //            if (detailPanel) detailPanel.SetActive(true);
+    //        });
+    //    }
+    //}
     public void Refresh()
     {
         foreach (Transform c in listParent) Destroy(c.gameObject);
@@ -18,7 +41,7 @@ public class QuizHistoryUI : MonoBehaviour
         var hist = QuizHistoryManager.Instance?.GetHistory();
         if (hist == null) return;
 
-        for (int i = 0; i < hist.Count; i++)
+        for (int i = hist.Count - 1; i >= 0; i--)   //  reverse order
         {
             var e = hist[i];
             var go = Instantiate(rowPrefab, listParent);
@@ -29,11 +52,12 @@ public class QuizHistoryUI : MonoBehaviour
             int index = i;
             if (btn) btn.onClick.AddListener(() =>
             {
-                QuizHistorySelection.Selected = hist[index]; // pass selection
+                QuizHistorySelection.Selected = hist[index];
                 if (detailPanel) detailPanel.SetActive(true);
             });
         }
     }
+
 
     public void ClearAll()
     {

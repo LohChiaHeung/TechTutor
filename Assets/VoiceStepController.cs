@@ -26,13 +26,13 @@ public class VoiceStepController : MonoBehaviour
         {
             StepState.I.NextStep();
             _lastVoiceTime = Time.unscaledTime;
-            Debug.Log("🗣 Voice command: NEXT step");
+            Debug.Log("Voice command: NEXT step");
         }
         else if (cooled && sayBack)
         {
             StepState.I.PrevStep();
             _lastVoiceTime = Time.unscaledTime;
-            Debug.Log("🗣 Voice command: BACK step");
+            Debug.Log("Voice command: BACK step");
         }
     }
 }

@@ -2,5 +2,6 @@
 <QCARConfig>
   <Tracking>
     <ImageTarget name="chatgptimagesep7202510_48_02am" size="1.000000 1.000000" />
+    <ImageTarget name="calculator_image" size="1.000000 1.671717" />
   </Tracking>
 </QCARConfig>

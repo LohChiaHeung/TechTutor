@@ -160,7 +160,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 4.1986, y: -139.6603}
+  m_AnchoredPosition: {x: 4.1986, y: -181}
   m_SizeDelta: {x: 600.8979, y: 27.3206}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &210188195
@@ -445,7 +445,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 43, y: 0.0000076293945}
+  m_AnchoredPosition: {x: 35, y: 0.0000076293945}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &456891034
@@ -468,7 +468,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: AI Chatbot
+  m_text: AI Tutor
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 44b591d6641b7e84b902824fec861437, type: 2}
   m_sharedMaterial: {fileID: 5539389264982333322, guid: 44b591d6641b7e84b902824fec861437, type: 2}
@@ -979,7 +979,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25, y: 3}
+  m_AnchoredPosition: {x: 48, y: 3}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1166801763
@@ -2149,7 +2149,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 77, y: -0.0000076293945}
+  m_AnchoredPosition: {x: 57, y: -0.0000076293945}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1999807322
@@ -2172,7 +2172,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: AR Learning
+  m_text: AR Learn
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 44b591d6641b7e84b902824fec861437, type: 2}
   m_sharedMaterial: {fileID: 5539389264982333322, guid: 44b591d6641b7e84b902824fec861437, type: 2}

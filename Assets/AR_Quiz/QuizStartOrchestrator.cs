@@ -109,7 +109,10 @@ public class QuizStartOrchestrator : MonoBehaviour
 
         // Otherwise feed our custom list directly
         QuizVoiceManager.Instance?.Mute();                    // ← block autospeak inside RenderQ
-        quizPanel.StartQuizWithQueue(finalList);
+        if (latest != null)
+            quizPanel.StartQuizWithQueue(finalList, latest.sessionId, latest.modelId);
+        else
+            quizPanel.StartQuizWithQueue(finalList, "nosession", key);
 
         StartCoroutine(SpeakFirstQuestionAfterUI(quizPanel, includeOptions: true));
     }

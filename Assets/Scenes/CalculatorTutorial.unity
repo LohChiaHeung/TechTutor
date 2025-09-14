@@ -2475,7 +2475,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 732544443}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadARGuideMainScene
+        m_MethodName: MainScene_ARGuide
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5657,7 +5657,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2049010817}
         m_TargetAssemblyTypeName: SceneSwitcher, Assembly-CSharp
-        m_MethodName: LoadARGuideMainScene
+        m_MethodName: MainScene_ARGuide
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7722,6 +7722,8 @@ MonoBehaviour:
   micOnSprite: {fileID: 21300000, guid: c4a51405094a1d140b632fab67fff22f, type: 3}
   micOffSprite: {fileID: 21300000, guid: d845b4414542b1c41b52a500ee66cd40, type: 3}
   stepManager: {fileID: 2049010815}
+  ttsAudio: {fileID: 0}
+  resumeDelay: 0.35
 --- !u!1 &1477285056
 GameObject:
   m_ObjectHideFlags: 0
@@ -10443,7 +10445,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1911280686
 Transform:
   m_ObjectHideFlags: 0

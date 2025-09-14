@@ -19,6 +19,7 @@ public class AR2_OcrOverlay : MonoBehaviour
 
     [Header("Mapping")]
     public bool ocrYTopLeft = true;
+    public bool coordsAreNormalized = false;
 
     [Header("Calibration")]
     public Vector2 pixelNudge = Vector2.zero;   // UI pixels in the overlay's (center-anchored) space
@@ -55,7 +56,6 @@ public class AR2_OcrOverlay : MonoBehaviour
         Debug.Log($"[PostLayout] RawImage={ri.width:0.##}x{ri.height:0.##}  Overlay={ov.width:0.##}x{ov.height:0.##}");
     }
 
-
     void StretchOverlayToParent()
     {
         if (!overlayLayer || !screenshotImage) return;
@@ -85,7 +85,7 @@ public class AR2_OcrOverlay : MonoBehaviour
 
         if (debugLayout)
         {
-            Debug.Log($"[AR2_OcrOverlay] Drew box: OCR({w.x},{w.y},{w.w},{w.h}) -> UI({ui.x},{ui.y},{ui.width},{ui.height})");
+            Debug.Log($"[AR2_OcrOverlay] Drew box: OCR({w.x},{w.y},{w.w},{w.h}) -> UI({ui.x:F1},{ui.y:F1},{ui.width:F1},{ui.height:F1})");
         }
     }
 
@@ -95,92 +95,190 @@ public class AR2_OcrOverlay : MonoBehaviour
         var inst = Instantiate(boxPrefab, overlayLayer);
 
         var rt = inst.GetComponent<RectTransform>();
-        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
+        rt.pivot = new Vector2(0f, 1f);
 
         pool.Add(inst);
         inst.gameObject.SetActive(true);
         return inst;
     }
 
-    // FIXED: Calculate the actual displayed image area within the RawImage container
+    // FIXED: Calculate the actual displayed image area considering AspectRatioFitter
     Rect GetDisplayedImageRect(int ocrW, int ocrH)
     {
-        var container = overlayLayer.rect;  // use overlay’s rect (final drawing space)
+        // Use the RawImage's actual rect (after AspectRatioFitter has done its work)
+        var rawImageRect = screenshotImage.rectTransform.rect;
 
-        float imgAspect = (float)ocrW / Mathf.Max(1, ocrH);
-        float contAspect = container.width / Mathf.Max(1f, container.height);
+        // Get the AspectRatioFitter if it exists
+        var arf = screenshotImage.GetComponent<AspectRatioFitter>();
 
-        float w, h, offX = 0f, offY = 0f;
-        if (imgAspect > contAspect) { w = container.width; h = container.width / imgAspect; offY = (container.height - h) * 0.5f; }
-        else { h = container.height; w = container.height * imgAspect; offX = (container.width - w) * 0.5f; }
-        return new Rect(offX, offY, w, h);
+        if (arf != null && arf.enabled)
+        {
+            float imgAspect = (float)ocrW / Mathf.Max(1, ocrH);
+            float containerAspect = rawImageRect.width / Mathf.Max(1f, rawImageRect.height);
+
+            float displayedW, displayedH, offsetX = 0f, offsetY = 0f;
+
+            switch (arf.aspectMode)
+            {
+                case AspectRatioFitter.AspectMode.FitInParent:
+                    if (imgAspect > containerAspect)
+                    {
+                        // Image is wider - fit to container width, letterbox top/bottom
+                        displayedW = rawImageRect.width;
+                        displayedH = rawImageRect.width / imgAspect;
+                        offsetY = (rawImageRect.height - displayedH) * 0.5f;
+                    }
+                    else
+                    {
+                        // Image is taller - fit to container height, letterbox left/right
+                        displayedH = rawImageRect.height;
+                        displayedW = rawImageRect.height * imgAspect;
+                        offsetX = (rawImageRect.width - displayedW) * 0.5f;
+                    }
+                    break;
+
+                case AspectRatioFitter.AspectMode.EnvelopeParent:
+                    if (imgAspect > containerAspect)
+                    {
+                        displayedH = rawImageRect.height;
+                        displayedW = rawImageRect.height * imgAspect;
+                        offsetX = (rawImageRect.width - displayedW) * 0.5f;
+                    }
+                    else
+                    {
+                        displayedW = rawImageRect.width;
+                        displayedH = rawImageRect.width / imgAspect;
+                        offsetY = (rawImageRect.height - displayedH) * 0.5f;
+                    }
+                    break;
+
+                default:
+                    // No aspect ratio fitting or other modes - use full container
+                    displayedW = rawImageRect.width;
+                    displayedH = rawImageRect.height;
+                    break;
+            }
+
+            return new Rect(offsetX, offsetY, displayedW, displayedH);
+        }
+        else
+        {
+            // No AspectRatioFitter - image fills entire container
+            return new Rect(0, 0, rawImageRect.width, rawImageRect.height);
+        }
     }
 
-    // --- REPLACE THIS METHOD IN AR2_OcrOverlay.cs ---
-    Rect MapOcrRectToOverlay(Rect ocrRectPx, int ocrW, int ocrH)
+    // FIXED: Better coordinate mapping that accounts for AspectRatioFitter
+    Rect MapOcrRectToOverlay(Rect ocrRect, int ocrW, int ocrH)
     {
-        // Get the overlay's rect (this is our drawing canvas)
-        var overlayRect = overlayLayer.rect;
+        // 1) Get the actual displayed image area within the RawImage
+        var displayRect = GetDisplayedImageRect(ocrW, ocrH);
+        float dispX = displayRect.x;
+        float dispY = displayRect.y;
+        float dispW = Mathf.Max(1f, displayRect.width);
+        float dispH = Mathf.Max(1f, displayRect.height);
 
-        // Simple direct mapping - assume RawImage fills the entire overlay area
-        float scaleX = overlayRect.width / Mathf.Max(1f, ocrW);
-        float scaleY = overlayRect.height / Mathf.Max(1f, ocrH);
+        // 2) Interpret incoming OCR rect (either pixels or normalized)
+        float srcX = ocrRect.x;
+        float srcY = ocrRect.y;
+        float srcW = Mathf.Max(0f, ocrRect.width);
+        float srcH = Mathf.Max(0f, ocrRect.height);
 
-        // Scale OCR coordinates to UI coordinates
-        float uiX = ocrRectPx.x * scaleX;
-        float uiY = ocrRectPx.y * scaleY;
-        float uiW = ocrRectPx.width * scaleX;
-        float uiH = ocrRectPx.height * scaleY;
-
-        // Handle Y-coordinate system (OCR typically uses top-left origin, UI uses bottom-left)
-        if (ocrYTopLeft)
+        if (coordsAreNormalized)
         {
-            // Flip Y coordinate: convert from top-left to bottom-left origin
-            uiY = overlayRect.height - uiY - uiH;
+            // normalized [0..1] → pixels in OCR space
+            srcX *= ocrW;
+            srcY *= ocrH;
+            srcW *= ocrW;
+            srcH *= ocrH;
         }
 
-        // Convert from bottom-left position to center-anchored position
-        // (since your overlay uses center pivot)
+        // 3) Scale OCR pixels → displayed-image pixels
+        float scaleX = dispW / Mathf.Max(1f, ocrW);
+        float scaleY = dispH / Mathf.Max(1f, ocrH);
+
+        float uiX = dispX + srcX * scaleX;
+        float uiY = dispY + srcY * scaleY;
+        float uiW = srcW * scaleX;
+        float uiH = srcH * scaleY;
+
+        // 4) Handle Y coordinate system conversion
+        if (ocrYTopLeft)
+        {
+            // OCR Y=0 is at top, Unity UI Y=0 is at bottom
+            // Convert: ocrY → displayHeight - ocrY - ocrHeight
+            uiY = dispY + dispH - (srcY + srcH) * scaleY;
+        }
+
+        // 5) Convert to center-anchored RectTransform coordinates
+        var overlayRect = overlayLayer.rect;
         float centerX = uiX + uiW * 0.5f;
         float centerY = uiY + uiH * 0.5f;
 
-        // Convert to anchoredPosition relative to overlay center
-        float ax = centerX - overlayRect.width * 0.5f;
-        float ay = centerY - overlayRect.height * 0.5f;
+        // Convert from bottom-left origin to center origin
+        float anchoredX = uiX + pixelNudge.x;
+        float anchoredY = -(uiY + uiH) + pixelNudge.y;
 
-        // Apply manual calibration nudges
-        ax += pixelNudge.x;
-        ay += pixelNudge.y;
-        uiW += sizeNudge.x;
-        uiH += sizeNudge.y;
+        if (debugLayout)
+        {
+            Debug.Log($"[MapOcr] OCR({srcX:F1},{srcY:F1},{srcW:F1},{srcH:F1}) " +
+                     $"Display({dispX:F1},{dispY:F1},{dispW:F1},{dispH:F1}) " +
+                     $"Scale({scaleX:F3},{scaleY:F3}) " +
+                     $"UI({uiX:F1},{uiY:F1},{uiW:F1},{uiH:F1}) " +
+                     $"Final({anchoredX:F1},{anchoredY:F1})");
+        }
 
-        return new Rect(ax, ay, uiW, uiH);
+        return new Rect(anchoredX, anchoredY, uiW + sizeNudge.x, uiH + sizeNudge.y);
     }
 
-
-    // --- ADD THIS OPTIONAL CALIBRATION VISUALIZER ---
+    // Calibration helper - draws boxes at OCR corners to verify mapping
     public void DrawCalibrationCross(int ocrW, int ocrH)
     {
         var corners = new[]
         {
-        new Rect(0, 0, 120, 40),                      // TL (in OCR px, y=top if ocrYTopLeft=true)
-        new Rect(ocrW - 120, 0, 120, 40),             // TR
-        new Rect(0, ocrH - 40, 120, 40),              // BL
-        new Rect(ocrW - 120, ocrH - 40, 120, 40)      // BR
-    };
+            new Rect(0, 0, 120, 40),                      // TL
+            new Rect(ocrW - 120, 0, 120, 40),             // TR
+            new Rect(0, ocrH - 40, 120, 40),              // BL
+            new Rect(ocrW - 120, ocrH - 40, 120, 40)      // BR
+        };
 
         foreach (var r in corners)
         {
             var ui = MapOcrRectToOverlay(r, ocrW, ocrH);
             var img = GetBox();
-            img.color = new Color(0, 0.6f, 1f, 0.25f);
+            img.color = new Color(0, 0.6f, 1f, 0.35f);
             img.rectTransform.anchoredPosition = ui.center;
             img.rectTransform.sizeDelta = ui.size;
             img.rectTransform.SetAsLastSibling();
         }
+
+        Debug.Log($"[CalibrationCross] Drew corner boxes for OCR({ocrW}x{ocrH})");
     }
 
+    // DEBUGGING: Call this to test if coordinates are mapping correctly
+    public void TestCoordinateMapping(int ocrW, int ocrH)
+    {
+        Debug.Log("=== COORDINATE MAPPING TEST ===");
+        Debug.Log($"OCR Image Size: {ocrW}x{ocrH}");
+        Debug.Log($"RawImage Rect: {screenshotImage.rectTransform.rect}");
+        Debug.Log($"RawImage uvRect: {screenshotImage.uvRect}");
+        Debug.Log($"Overlay Rect: {overlayLayer.rect}");
+
+        // Test a few key points
+        var testPoints = new[]
+        {
+            new Rect(0, 0, 50, 50),           // Top-left corner
+            new Rect(ocrW/2f-25, ocrH/2f-25, 50, 50), // Center
+            new Rect(ocrW-50, ocrH-50, 50, 50) // Bottom-right corner
+        };
+
+        foreach (var testRect in testPoints)
+        {
+            var mapped = MapOcrRectToOverlay(testRect, ocrW, ocrH);
+            Debug.Log($"OCR({testRect.x},{testRect.y},{testRect.width}x{testRect.height}) -> UI({mapped.x:F1},{mapped.y:F1},{mapped.width:F1}x{mapped.height:F1})");
+        }
+    }
 
     void LoadNudge()
     {
@@ -192,12 +290,14 @@ public class AR2_OcrOverlay : MonoBehaviour
                 pixelNudge = new Vector2(nx, ny);
         }
     }
+
     void SaveNudge()
     {
         string key = SystemInfo.deviceModel + "_ocr_nudge";
         PlayerPrefs.SetString(key, $"{pixelNudge.x},{pixelNudge.y}");
         PlayerPrefs.Save();
     }
+
     public void DrawAllOcrBoxes(OcrResponse resp)
     {
         if (!showDebugBoxes || resp?.words == null) return;
@@ -214,20 +314,21 @@ public class AR2_OcrOverlay : MonoBehaviour
     {
         if (!showImageBounds || !screenshotImage) return;
 
-        var container = screenshotImage.rectTransform.rect;
         var displayedRect = GetDisplayedImageRect(ocrW, ocrH);
+        var overlayRect = overlayLayer.rect;
 
         var img = GetBox();
         img.color = imageBoundsColor;
 
-        float centerX = displayedRect.x + displayedRect.width * 0.5f - container.width * 0.5f;
-        float centerY = displayedRect.y + displayedRect.height * 0.5f - container.height * 0.5f;
+        // Center the bounds visualization
+        float centerX = displayedRect.x + displayedRect.width * 0.5f - overlayRect.width * 0.5f;
+        float centerY = displayedRect.y + displayedRect.height * 0.5f - overlayRect.height * 0.5f;
 
         img.rectTransform.anchoredPosition = new Vector2(centerX, centerY);
         img.rectTransform.sizeDelta = new Vector2(displayedRect.width, displayedRect.height);
         img.rectTransform.SetAsFirstSibling();
 
-        Debug.Log($"[ImageBounds] Container({container.width:F1}x{container.height:F1}) " +
+        Debug.Log($"[ImageBounds] RawImage({screenshotImage.rectTransform.rect.width:F1}x{screenshotImage.rectTransform.rect.height:F1}) " +
                   $"Display({displayedRect.width:F1}x{displayedRect.height:F1}) " +
                   $"Offset({displayedRect.x:F1},{displayedRect.y:F1})");
     }

@@ -26,6 +26,8 @@ public class QuizPanelController : MonoBehaviour
 
     // NEW: track history items for this session
     private List<QuizHistoryItem> _histItems = new List<QuizHistoryItem>();
+    // at top of class
+    private Coroutine _speakCo;
 
 
     [Header("UI")]
@@ -132,8 +134,52 @@ public class QuizPanelController : MonoBehaviour
         _sessionIdForAudio = string.IsNullOrEmpty(sessionId) ? "nosession" : sessionId;
         _modelIdForAudio = string.IsNullOrEmpty(modelId) ? "nomodel" : modelId;
         StartQuizWithQueue(queue);
+        //StartCoroutine(SpeakAfterFrame());
     }
 
+    // --- Add to class ---
+    // Put inside QuizPanelController (e.g., near other helpers)
+
+    // Fingerprint prompt + 4 options (order-sensitive)
+    private static string Fingerprint(QuizQuestion q)
+    {
+        if (q == null) return "noq";
+        unchecked
+        {
+            uint h = 2166136261;
+            void mix(string s)
+            {
+                if (s == null) return;
+                foreach (char c in s) { h ^= (byte)c; h *= 16777619; }
+                h ^= (byte)'|'; h *= 16777619;
+            }
+            mix(q.prompt);
+            if (q.options != null)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    var s = (i < q.options.Length) ? (q.options[i] ?? "") : "";
+                    mix(s);
+                }
+            }
+            return h.ToString("x8");
+        }
+    }
+
+    private string CacheKeyForCurrent(string suffix, bool includeOptions)
+    {
+        const string v = "v2"; // bump version once to invalidate all old clips
+        var q = GetCurrentQuestion();
+        string fp = includeOptions ? Fingerprint(q) : "nop";
+        return $"{_modelIdForAudio}_{_sessionIdForAudio}_{v}_q{_qIndex}_{fp}_{suffix}";
+    }
+
+
+    private IEnumerator SpeakAfterFrame()
+    {
+        yield return null; // wait for RenderQ to finish
+        RepeatSpeakCurrent(includeOptions: true);
+    }
     private void RenderQ()
     {
         CancelAutoAdvance();
@@ -211,33 +257,73 @@ public class QuizPanelController : MonoBehaviour
         if (feedbackText) feedbackText.color = feedbackDefault;
         SetInteract(backButton, _qIndex > 0);
 
-        if (speakQuestionAndOptions && aiSpeaker)
+        //if (speakQuestionAndOptions && aiSpeaker)
+        //{
+        //    // Only gate the TTS call, don't return from RenderQ()
+        //    bool canSpeak = (QuizVoiceManager.Instance == null) || QuizVoiceManager.Instance.allowSpeak;
+
+        //    if (canSpeak)
+        //    {
+        //        if (q.type == "pick3d")
+        //        {
+        //            aiSpeaker.SpeakText(q.prompt, CacheKeyFor(_qIndex, "prompt"));
+        //        }
+        //        else
+        //        {
+        //            var sb = new System.Text.StringBuilder();
+        //            sb.Append(q.prompt);
+        //            if (q.options != null && q.options.Length >= 4)
+        //            {
+        //                sb.Append(" Options: A. ").Append(q.options[0])
+        //                  .Append(" B. ").Append(q.options[1])
+        //                  .Append(" C. ").Append(q.options[2])
+        //                  .Append(" D. ").Append(q.options[3]);
+        //            }
+        //            aiSpeaker.SpeakText(sb.ToString(), CacheKeyFor(_qIndex, "full"));
+        //        }
+        //    }
+        //}
+        ScheduleSpeak(includeOptions: q.type != "pick3d");
+    }
+
+    private void ScheduleSpeak(bool includeOptions = true)
+    {
+        if (!speakQuestionAndOptions || !aiSpeaker) return;
+        if (QuizVoiceManager.Instance != null && !QuizVoiceManager.Instance.allowSpeak) return;
+
+        if (_speakCo != null) StopCoroutine(_speakCo);
+        _speakCo = StartCoroutine(Co_SpeakAfterFrame(includeOptions));
+    }
+
+    private IEnumerator Co_SpeakAfterFrame(bool includeOptions)
+    {
+        // wait until UI & shuffle are fully applied this frame
+        yield return null;
+
+        // build narration from the *current* question (post-shuffle)
+        var q = GetCurrentQuestion();
+        if (q == null) yield break;
+
+        // optional: stop any stray playback
+        QuizVoiceManager.Instance?.Stop();
+
+        if (q.type == "pick3d" || !includeOptions)
         {
-            // Only gate the TTS call, don't return from RenderQ()
-            bool canSpeak = (QuizVoiceManager.Instance == null) || QuizVoiceManager.Instance.allowSpeak;
-
-            if (canSpeak)
-            {
-                if (q.type == "pick3d")
-                {
-                    aiSpeaker.SpeakText(q.prompt, CacheKeyFor(_qIndex, "prompt"));
-                }
-                else
-                {
-                    var sb = new System.Text.StringBuilder();
-                    sb.Append(q.prompt);
-                    if (q.options != null && q.options.Length >= 4)
-                    {
-                        sb.Append(" Options: A. ").Append(q.options[0])
-                          .Append(" B. ").Append(q.options[1])
-                          .Append(" C. ").Append(q.options[2])
-                          .Append(" D. ").Append(q.options[3]);
-                    }
-                    aiSpeaker.SpeakText(sb.ToString(), CacheKeyFor(_qIndex, "full"));
-                }
-            }
+            aiSpeaker.SpeakText(q.prompt, CacheKeyForCurrent("prompt", false));
         }
-
+        else
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append(q.prompt);
+            if (q.options != null && q.options.Length >= 4)
+            {
+                sb.Append(" Options: A. ").Append(q.options[0])
+                  .Append(" B. ").Append(q.options[1])
+                  .Append(" C. ").Append(q.options[2])
+                  .Append(" D. ").Append(q.options[3]);
+            }
+            aiSpeaker.SpeakText(sb.ToString(), CacheKeyForCurrent("full", true));
+        }
     }
 
     public void RepeatSpeakCurrent(bool includeOptions = true)

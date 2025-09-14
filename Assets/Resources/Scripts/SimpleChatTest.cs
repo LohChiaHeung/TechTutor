@@ -13,6 +13,7 @@ using NativeGalleryNamespace;
 using NativeCameraNamespace;
 using System;
 using System.Linq;
+using GuideModel = global::AIGuide;
 
 public class TechTutorAskUI : MonoBehaviour
 {
@@ -35,26 +36,12 @@ public class TechTutorAskUI : MonoBehaviour
     public RawImage fullScreenImage;
     public Button closeFullScreenButton;
 
-    private AIGuide lastGuide = null;
+    private GuideModel lastGuide;
 
     [Header("OpenAI API")]
     [TextArea(5, 10)]
-    public string openAIKey = "sk-..."; // Use your valid key
+    public string openAIKey = "sk-...";
     private string apiUrl = "https://api.openai.com/v1/chat/completions";
-
-    //[System.Serializable]
-    //public class AIGuide { public StepItem[] steps; }
-
-    //[System.Serializable]
-    //public class StepItem
-    //{
-    //    public string title;         // "Step 1"
-    //    public string instruction;   // "Click English Training"
-    //    public string[] keywords;    // ["English Training"]
-    //    public string[] alts;        // optional variations
-    //    public string action_type;   // click|type|select|menu|scroll|observe
-    //    public string notes;         // optional tips
-    //}
 
     private string lastBotReply = "";
 
@@ -88,7 +75,7 @@ public class TechTutorAskUI : MonoBehaviour
         return System.IO.Path.Combine(Application.persistentDataPath, "ar_guide_cache.json");
     }
 
-    void SaveARGuideCache(AIGuide guide, string imagePath)
+    void SaveARGuideCache(GuideModel guide, string imagePath)
     {
         if (guide == null || guide.steps == null || guide.steps.Length == 0) return;
         if (string.IsNullOrEmpty(imagePath) || !System.IO.File.Exists(imagePath)) return;
@@ -110,7 +97,7 @@ public class TechTutorAskUI : MonoBehaviour
         }
     }
 
-    bool LoadARGuideCache(out AIGuide guide, out string imagePath)
+    bool LoadARGuideCache(out GuideModel guide, out string imagePath)
     {
         guide = null;
         imagePath = null;
@@ -229,248 +216,6 @@ public class TechTutorAskUI : MonoBehaviour
             Debug.LogWarning("User tried to send an empty message.");
         }
     }
-
-    //    IEnumerator SendMessageToOpenAI(string userMessage)
-    //    {
-    //        string model;
-    //        string json = "";
-    //        string base64Image = "";
-    //        bool includeImage = selectedImage != null;
-
-    //        // Shared system prompt for both modes
-    //        string systemPrompt =
-    //"You are TechTutor, an AI assistant that helps users with computer and software tasks.\n\n" +
-    //"Always respond in this strict format:\n\n" +
-    //"Step 1: [Short action instruction]\n" +
-    //"→ [Brief explanation of this step]\n\n" +
-    //"Step 2: ...\n" +
-    //"→ ...\n\n" +
-    //"- Include at least 4–5 steps if needed\n" +
-    //"- Use simple words and clear explanations\n" +
-    //"- Do NOT include greetings, summaries, or extra tips\n" +
-    //"- Do NOT use Markdown, headings, or ### symbols\n" +
-    //"- Do NOT format as code or use special characters\n" +
-    //"- Keep everything plain text for display in a 2D canvas\n";
-
-
-    //        if (includeImage)
-    //        {
-    //            base64Image = EncodeImageToBase64(selectedImage);
-    //            model = "gpt-4o";
-
-    //            json = @"{
-    //            ""model"": """ + model + @""",
-    //            ""messages"": [
-    //                {""role"": ""system"", ""content"": """ + EscapeJson(systemPrompt) + @"""},
-    //                {
-    //                    ""role"": ""user"",
-    //                    ""content"": [
-    //                        {""type"": ""text"", ""text"": """ + EscapeJson(userMessage) + @"""},
-    //                        {""type"": ""image_url"", ""image_url"": {""url"": ""data:image/png;base64," + base64Image + @""" }}
-    //                    ]
-    //                }
-    //            ],
-    //            ""max_tokens"": 1000
-    //        }";
-    //        }
-    //        else
-    //        {
-    //            model = "gpt-3.5-turbo";
-
-    //            json = @"{
-    //            ""model"": """ + model + @""",
-    //            ""messages"": [
-    //                {""role"": ""system"", ""content"": """ + EscapeJson(systemPrompt) + @"""},
-    //                {""role"": ""user"", ""content"": """ + EscapeJson(userMessage) + @"""}
-    //            ],
-    //            ""max_tokens"": 1000
-    //        }";
-    //        }
-
-    //        // Send request
-    //        UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
-    //        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-    //        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-    //        request.downloadHandler = new DownloadHandlerBuffer();
-
-    //        request.SetRequestHeader("Content-Type", "application/json");
-    //        request.SetRequestHeader("Authorization", "Bearer " + openAIKey);
-
-    //        responseText.text += $"\n\nYou: {userMessage}\n\nTechTutor:\nThinking...";
-    //        Canvas.ForceUpdateCanvases();
-    //        chatScrollRect.verticalNormalizedPosition = 1f;
-
-    //        yield return request.SendWebRequest();
-
-    //        if (request.result == UnityWebRequest.Result.Success)
-    //        {
-    //            string jsonResponse = request.downloadHandler.text;
-    //            string reply = ExtractReply(jsonResponse);
-    //            lastBotReply = reply;
-
-    //            string previousText = responseText.text.Replace("Thinking...", "");
-    //            StartCoroutine(TypeText(previousText, reply));
-
-    //            string fullFormatted = $"You: {userMessage}\n\nTechTutor:\n{reply}";
-    //            historyList.Add(new HistoryEntry { reply = fullFormatted });
-    //            SaveHistory();
-
-    //            if (reply.Contains("Step 1") && reply.Contains("Step 2"))
-    //                arModeButton.gameObject.SetActive(true);
-
-    //            PlayerPrefs.SetString("last_question", userMessage);
-    //            PlayerPrefs.SetString("last_reply", reply);
-    //            PlayerPrefs.Save();
-    //        }
-    //        else
-    //        {
-    //            responseText.text = responseText.text.Replace("Thinking...", "Error: " + request.error);
-    //            Debug.LogError("OpenAI Error: " + request.downloadHandler.text);
-    //        }
-
-    //        Canvas.ForceUpdateCanvases();
-    //        chatScrollRect.verticalNormalizedPosition = 0f;
-    //    }
-
-    //IEnumerator SendMessageToOpenAI(string userMessage)
-    //{
-    //    string model;
-    //    string json = "";
-    //    string base64Image = "";
-    //    bool includeImage = selectedImage != null;
-
-    //     //Shared system prompt for both modes
-    //        string systemPrompt =
-    //    "You are TechTutor, an AI assistant that helps users with computer and software tasks.\n\n" +
-    //    "Always respond in this strict format:\n\n" +
-    //    "Step 1: [Short action instruction]\n" +
-    //    "→ [Brief explanation of this step]\n\n" +
-    //    "Step 2: ...\n" +
-    //    "→ ...\n\n" +
-    //    "- Include at least 4–5 steps if needed\n" +
-    //    "- Use simple words and clear explanations\n" +
-    //    "- Do NOT include greetings, summaries, or extra tips\n" +
-    //    "- Do NOT use Markdown, headings, or ### symbols\n" +
-    //    "- Do NOT format as code or use special characters\n" +
-    //    "- Keep everything plain text for display in a 2D canvas\n";
-
-    //    if (includeImage)
-    //    {
-    //        base64Image = EncodeImageToBase64(selectedImage);
-    //        model = "gpt-4o";
-
-    //        json = @"{
-    //        ""model"": """ + model + @""",
-    //        ""messages"": [
-    //            {""role"": ""system"", ""content"": """ + EscapeJson(systemPrompt) + @"""},
-    //            {
-    //                ""role"": ""user"",
-    //                ""content"": [
-    //                    {""type"": ""text"", ""text"": """ + EscapeJson(userMessage) + @"""},
-    //                    {""type"": ""image_url"", ""image_url"": {""url"": ""data:image/png;base64," + base64Image + @""" }}
-    //                ]
-    //            }
-    //        ],
-    //        ""max_tokens"": 1000
-    //    }";
-    //    }
-    //    else
-    //    {
-    //        model = "gpt-3.5-turbo";
-
-    //        json = @"{
-    //        ""model"": """ + model + @""",
-    //        ""messages"": [
-    //            {""role"": ""system"", ""content"": """ + EscapeJson(systemPrompt) + @"""},
-    //            {""role"": ""user"", ""content"": """ + EscapeJson(userMessage) + @"""}
-    //        ],
-    //        ""max_tokens"": 1000
-    //    }";
-    //    }
-
-    //    // Send request
-    //    UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
-    //    byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-    //    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-    //    request.downloadHandler = new DownloadHandlerBuffer();
-
-    //    request.SetRequestHeader("Content-Type", "application/json");
-    //    request.SetRequestHeader("Authorization", "Bearer " + openAIKey);
-
-    //    responseText.text += $"\n\nYou: {userMessage}\n\nTechTutor:\nThinking...";
-    //    Canvas.ForceUpdateCanvases();
-    //    chatScrollRect.verticalNormalizedPosition = 1f;
-
-    //    yield return request.SendWebRequest();
-
-    //    if (request.result == UnityWebRequest.Result.Success)
-    //    {
-    //        string jsonResponse = request.downloadHandler.text;
-    //        string reply = ExtractReply(jsonResponse);
-    //        lastBotReply = reply;
-
-    //        // Try to parse the reply as AIGuide JSON
-    //        // First parse attempt
-    //        bool ok = TryParseGuideFromReply(reply, out lastGuide);
-
-    //        if (!ok || reply.IndexOf("i'm sorry", System.StringComparison.OrdinalIgnoreCase) >= 0)
-    //        {
-    //            Debug.LogWarning("[AI] First reply not valid JSON or contained a refusal. Retrying with stricter instructions.");
-
-    //            // Build a stricter user prompt and re-call once
-    //            string retryUserPrompt =
-    //                "Return ONLY the JSON object. No apologies, no markdown, no extra keys.\n" +
-    //                "If some details are unknown, put reasonable placeholders and STILL return JSON.\n" +
-    //                "JSON schema:\n" +
-    //                "{ \"steps\": [ { \"title\": \"Step 1\", \"instruction\": \"...\", \"keywords\": [\"...\"], \"alts\": [], \"action_type\": \"click\", \"notes\": \"\" } ] }\n" +
-    //                $"User task: \"{userMessage}\"";
-
-    //            yield return StartCoroutine(CallOpenAI_JSONOnly(systemPrompt, retryUserPrompt, includeImage, base64Image,
-    //                (retryReply) =>
-    //                {
-    //                    lastBotReply = retryReply; // keep full raw for the UI if you want
-    //                    ok = TryParseGuideFromReply(retryReply, out lastGuide);
-    //                },
-    //                (err) => { Debug.LogError(err); ok = false; }
-    //            ));
-    //        }
-
-    //        if (ok && lastGuide != null && lastGuide.steps != null && lastGuide.steps.Length > 0)
-    //        {
-    //            arModeButton.gameObject.SetActive(true);
-    //            responseText.text += "\n\n[✅ Parsed steps ready for AR]";
-    //        }
-    //        else
-    //        {
-    //            responseText.text += "\n\n[⚠️ Could not parse steps JSON; showing raw text only]";
-    //        }
-
-
-    //        string previousText = responseText.text.Replace("Thinking...", "");
-    //        StartCoroutine(TypeText(previousText, reply));
-
-    //        // ✅ Save to the new Chat History (1 question + 1 answer)
-    //        string imagePathOrNull = SaveQuestionImageIfAny(); // returns null if no image
-    //        ChatHistoryStore.Instance.Add(userMessage, reply, imagePathOrNull);
-
-    //        // Keep your AR-mode toggle logic
-    //        if (reply.Contains("Step 1") && reply.Contains("Step 2"))
-    //            arModeButton.gameObject.SetActive(true);
-
-    //        PlayerPrefs.SetString("last_question", userMessage);
-    //        PlayerPrefs.SetString("last_reply", reply);
-    //        PlayerPrefs.Save();
-    //    }
-    //    else
-    //    {
-    //        responseText.text = responseText.text.Replace("Thinking...", "Error: " + request.error);
-    //        Debug.LogError("OpenAI Error: " + request.downloadHandler.text);
-    //    }
-
-    //    Canvas.ForceUpdateCanvases();
-    //    chatScrollRect.verticalNormalizedPosition = 0f;
-    //}
-    // Remove emojis that TextMeshPro font can't render
     string SanitizeForTMP(string s)
     {
         if (string.IsNullOrEmpty(s)) return s;
@@ -496,6 +241,18 @@ public class TechTutorAskUI : MonoBehaviour
         return b.ToString().TrimEnd();
     }
 
+    //    string systemPrompt =
+    //"You are TechTutor, an AI assistant that explains computer tasks step-by-step.\n\n" +
+    //"Always respond in this STRICT plain-text format ONLY (no markdown, no headings, no code fences):\n" +
+    //"Step 1: <short action>\n" +
+    //"→ <very brief explanation>\n\n" +
+    //"Step 2: <short action>\n" +
+    //"→ <very brief explanation>\n\n" +
+    //"- Include 4–6 steps if needed\n" +
+    //"- Use simple words\n" +
+    //"- Do NOT add greetings, summaries, tips, or anything else\n" +
+    //"- Do NOT use ### or any markdown\n" +
+    //"- Do NOT wrap your answer in JSON or code fences\n";
     IEnumerator SendMessageToOpenAI(string userMessage)
     {
         string json = "";
@@ -503,17 +260,22 @@ public class TechTutorAskUI : MonoBehaviour
         bool includeImage = selectedImage != null;
 
         string systemPrompt =
-    "You are TechTutor, an AI assistant that explains computer tasks step-by-step.\n\n" +
-    "Always respond in this STRICT plain-text format ONLY (no markdown, no headings, no code fences):\n" +
-    "Step 1: <short action>\n" +
-    "→ <very brief explanation>\n\n" +
-    "Step 2: <short action>\n" +
-    "→ <very brief explanation>\n\n" +
-    "- Include 4–6 steps if needed\n" +
-    "- Use simple words\n" +
-    "- Do NOT add greetings, summaries, tips, or anything else\n" +
-    "- Do NOT use ### or any markdown\n" +
-    "- Do NOT wrap your answer in JSON or code fences\n";
+"You are TechTutor, an AI assistant that explains computer tasks step-by-step.\n\n" +
+"Always respond in this STRICT plain-text format ONLY (no markdown, no code fences):\n" +
+"Step 1: <short action>\n" +
+"→ <very brief explanation>\n" +
+"Keywords: <1-3 exact UI tokens from the image, comma-separated>\n\n" +
+"Step 2: <short action>\n" +
+"→ <very brief explanation>\n" +
+"Keywords: <1-3 exact UI tokens from the image, comma-separated>\n\n" +
+"- Include 4–6 steps if needed\n" +
+"- Use simple words\n" +
+"- Keywords MUST be short, verbatim labels visible in the IMAGE (menu text, button labels, tab names, shortcuts like Ctrl+C)\n" +
+"- Do NOT invent tokens; if none are visible for a step, write: Keywords: (none)\n" +
+"- Do NOT add greetings, summaries, tips, or anything else\n" +
+"- Do NOT use ### or any markdown\n" +
+"- Do NOT wrap your answer in JSON or code fences\n";
+       
 
         string model = includeImage ? "gpt-4o" : "gpt-4o-mini";
 
@@ -529,7 +291,7 @@ public class TechTutorAskUI : MonoBehaviour
               ""role"": ""user"",
               ""content"": [
                 { ""type"": ""text"", ""text"": """ + EscapeJson(userMessage) + @""" },
-                { ""type"": ""image_url"", ""image_url"": { ""url"": ""data:image/png;base64," + base64Image + @""" } }
+                { ""type"": ""image_url"", ""image_url"": { ""url"": ""data:image/jpeg;base64," + base64Image + @""" } }
               ]
             }
           ],
@@ -578,18 +340,44 @@ public class TechTutorAskUI : MonoBehaviour
             // still build guide so AR can run
             lastGuide = BuildGuideFromPlainSteps(reply);
 
+            string displayReply = StripKeywordLines(reply);
+            StartCoroutine(TypeText(responseText.text, displayReply));
+
+            if (lastGuide?.steps != null)
+            {
+                for (int si = 0; si < lastGuide.steps.Length; si++)
+                {
+                    var s = lastGuide.steps[si];
+                    var kw = (s.keywords == null || s.keywords.Length == 0) ? "(none)" : string.Join(", ", s.keywords);
+                    Debug.Log($"[Guide/OpenAI] Step {si + 1} \"{s.title}\": keywords = {kw}");
+                }
+            }
+
             // Type out ONLY the assistant reply (since we already added "You:" above)
-            StartCoroutine(TypeText(responseText.text, reply));
+            // StartCoroutine(TypeText(responseText.text, reply));
 
             // Save to history
             string imagePathOrNull = SaveQuestionImageIfAny();
-            ChatHistoryStore.Instance.Add(userMessage, reply, imagePathOrNull);
+            ChatHistoryStore.Instance.Add(userMessage, displayReply, imagePathOrNull);
 
             // Save AR cache for offline AR testing
-            if (lastGuide != null && lastGuide.steps != null && lastGuide.steps.Length > 0 && !string.IsNullOrEmpty(imagePathOrNull))
+            // Save guide + image for AR Mode reuse (no more tokens)
+            if (lastGuide != null && lastGuide.steps != null && lastGuide.steps.Length > 0)
             {
-                SaveARGuideCache(lastGuide, imagePathOrNull);
+                ARCache.SaveGuide(lastGuide);
+                if (selectedImage != null)
+                {
+                    ARCache.SavePngOrJpg(selectedImage);
+                }
+                //PlayerPrefs.SetString("last_question", userMessage);
+                //PlayerPrefs.SetString("last_reply", reply);   // RAW with Keywords for AR parsing
+                //PlayerPrefs.Save();
+                else
+                {
+                    // if you store the path elsewhere, copy it to ARCache.ImagePath here (optional)
+                }
             }
+
 
             PlayerPrefs.SetString("last_question", userMessage);
             PlayerPrefs.SetString("last_reply", reply);
@@ -605,58 +393,134 @@ public class TechTutorAskUI : MonoBehaviour
         RebuildAndScrollToBottom();
     }
 
+    void EnsureGuideRunContext()
+    {
+        if (GuideRunContext.I == null)
+        {
+            var go = new GameObject("GuideRunContext");
+            go.AddComponent<GuideRunContext>();   // has DontDestroyOnLoad() inside
+        }
+    }
 
     // Turn the plain "Step 1 / → ..." text into an AIGuide for AR_ImageTest
+    //GuideModel BuildGuideFromPlainSteps(string text)
+    //{
+    //    if (string.IsNullOrWhiteSpace(text)) return null;
+
+    //    var lines = text.Replace("\r", "").Split('\n');
+    //    var steps = new List<AIGuideStep>();
+    //    AIGuideStep current = null;
+
+    //    foreach (var raw in lines)
+    //    {
+    //        var line = raw.Trim();
+    //        if (line.StartsWith("Step "))
+    //        {
+    //            if (current != null)
+    //            {
+    //                // fill keywords + action_type before pushing
+    //                current.keywords = ExtractKeywordsFromStep(current.title, current.instruction);
+    //                current.action_type = InferActionType(current.title, current.instruction);
+    //                steps.Add(current);
+    //            }
+
+    //            current = new StepItem
+    //            {
+    //                title = line,                 // e.g., "Step 1: Click Start"
+    //                instruction = "",
+    //                keywords = Array.Empty<string>(),
+    //                alts = Array.Empty<string>(),
+    //                action_type = "",
+    //                notes = ""
+    //            };
+    //        }
+    //        else if (line.StartsWith("→"))
+    //        {
+    //            if (current != null)
+    //            {
+    //                current.instruction = line.Length > 1 ? line.Substring(1).Trim() : "";
+    //            }
+    //        }
+    //    }
+
+    //    if (current != null)
+    //    {
+    //        current.keywords = ExtractKeywordsFromStep(current.title, current.instruction);
+    //        current.action_type = InferActionType(current.title, current.instruction);
+    //        steps.Add(current);
+    //    }
+
+    //    if (steps.Count == 0) return null;
+    //    return new GuideModel { steps = steps.ToArray() };
+    //}
+
     AIGuide BuildGuideFromPlainSteps(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return null;
 
         var lines = text.Replace("\r", "").Split('\n');
-        var steps = new List<StepItem>();
-        StepItem current = null;
+        var steps = new List<AIGuideStep>();
+        AIGuideStep current = null;
 
-        foreach (var raw in lines)
+        for (int i = 0; i < lines.Length; i++)
         {
-            var line = raw.Trim();
-            if (line.StartsWith("Step "))
+            string line = lines[i].Trim();
+
+            if (line.StartsWith("Step ", StringComparison.OrdinalIgnoreCase))
             {
+                // flush previous step
                 if (current != null)
                 {
-                    // fill keywords + action_type before pushing
-                    current.keywords = ExtractKeywordsFromStep(current.title, current.instruction);
-                    current.action_type = InferActionType(current.title, current.instruction);
+                    if (current.keywords == null || current.keywords.Length == 0)
+                        current.keywords = ExtractKeywordsFromStep(current.title, current.instruction); // fallback
                     steps.Add(current);
                 }
 
-                current = new StepItem
+                current = new AIGuideStep
                 {
-                    title = line,                 // e.g., "Step 1: Click Start"
+                    title = line,
                     instruction = "",
-                    keywords = Array.Empty<string>(),
-                    alts = Array.Empty<string>(),
-                    action_type = "",
-                    notes = ""
+                    keywords = Array.Empty<string>()
                 };
-            }
-            else if (line.StartsWith("→"))
-            {
-                if (current != null)
+
+                // next line may be explanation (→ …)
+                if (i + 1 < lines.Length && lines[i + 1].TrimStart().StartsWith("→"))
                 {
-                    current.instruction = line.Length > 1 ? line.Substring(1).Trim() : "";
+                    current.instruction = lines[i + 1].Trim().TrimStart('→', ' ').Trim();
+                    i++;
+                }
+
+                // optional: next line may be Keywords: …
+                if (i + 1 < lines.Length && lines[i + 1].TrimStart().StartsWith("Keywords:", StringComparison.OrdinalIgnoreCase))
+                {
+                    string raw = lines[i + 1].Substring(lines[i + 1].IndexOf(':') + 1).Trim();
+                    if (!string.IsNullOrEmpty(raw) && !raw.Equals("(none)", StringComparison.OrdinalIgnoreCase))
+                    {
+                        current.keywords = raw.Split(',')
+                                               .Select(s => s.Trim())
+                                               .Where(s => s.Length > 0)
+                                               .ToArray();
+                    }
+                    i++;
                 }
             }
         }
 
+        // flush last step
         if (current != null)
         {
-            current.keywords = ExtractKeywordsFromStep(current.title, current.instruction);
-            current.action_type = InferActionType(current.title, current.instruction);
+            if (current.keywords == null || current.keywords.Length == 0)
+                current.keywords = ExtractKeywordsFromStep(current.title, current.instruction); // fallback
             steps.Add(current);
         }
 
         if (steps.Count == 0) return null;
         return new AIGuide { steps = steps.ToArray() };
     }
+
+
+
+
 
     static readonly HashSet<string> Stop = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
 {
@@ -671,6 +535,24 @@ public class TechTutorAskUI : MonoBehaviour
     "click","press","select","choose","open","tap","type","enter","go to","navigate to",
     "search for","hit","use","pick","enable","disable","check","uncheck","switch","expand","collapse"
 };
+
+    string StripKeywordLines(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return s;
+        var lines = s.Replace("\r", "").Split('\n');
+        var kept = new System.Text.StringBuilder(s.Length);
+
+        foreach (var raw in lines)
+        {
+            var line = raw.TrimStart();
+            // hide both "Keyword:" and "Keywords:", any casing
+            if (line.StartsWith("Keywords:", StringComparison.OrdinalIgnoreCase)) continue;
+            if (line.StartsWith("Keyword:", StringComparison.OrdinalIgnoreCase)) continue;
+
+            kept.AppendLine(raw);
+        }
+        return kept.ToString().TrimEnd();
+    }
 
     string[] ExtractKeywordsFromStep(string title, string instruction)
     {
@@ -869,41 +751,71 @@ public class TechTutorAskUI : MonoBehaviour
         return input.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n");
     }
 
-    string EncodeImageToBase64(Texture2D sourceTexture, int targetSize = 512)
+    //string EncodeImageToBase64(Texture2D sourceTexture, int targetSize = 512)
+    //{
+    //    if (sourceTexture == null) return "";
+
+    //    // Scale to target size if needed
+    //    int width = sourceTexture.width;
+    //    int height = sourceTexture.height;
+
+    //    float scale = 1f;
+    //    if (Mathf.Max(width, height) > targetSize)
+    //        scale = targetSize / (float)Mathf.Max(width, height);
+
+    //    int newWidth = Mathf.RoundToInt(width * scale);
+    //    int newHeight = Mathf.RoundToInt(height * scale);
+
+    //    // Create a temporary RenderTexture and blit
+    //    RenderTexture rt = RenderTexture.GetTemporary(newWidth, newHeight, 0, RenderTextureFormat.ARGB32);
+    //    var prev = RenderTexture.active;
+    //    Graphics.Blit(sourceTexture, rt);
+    //    RenderTexture.active = rt;
+
+    //    // Read into a new readable Texture2D
+    //    Texture2D readableTex = new Texture2D(newWidth, newHeight, TextureFormat.RGB24, false);
+    //    readableTex.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
+    //    readableTex.Apply();
+
+    //    RenderTexture.active = prev;
+    //    RenderTexture.ReleaseTemporary(rt);
+
+    //    // Encode to JPG
+    //    byte[] imageBytes = readableTex.EncodeToJPG(60); // 60% quality
+    //    UnityEngine.Object.Destroy(readableTex);         // cleanup
+
+    //    return System.Convert.ToBase64String(imageBytes);
+    //}
+    string EncodeImageToBase64(Texture2D sourceTexture, int targetSize = 1024) // was 512
     {
         if (sourceTexture == null) return "";
 
-        // Scale to target size if needed
-        int width = sourceTexture.width;
-        int height = sourceTexture.height;
-
+        int width = sourceTexture.width, height = sourceTexture.height;
         float scale = 1f;
-        if (Mathf.Max(width, height) > targetSize)
-            scale = targetSize / (float)Mathf.Max(width, height);
+        int maxDim = Mathf.Max(width, height);
+        if (maxDim > targetSize) scale = targetSize / (float)maxDim;
 
         int newWidth = Mathf.RoundToInt(width * scale);
         int newHeight = Mathf.RoundToInt(height * scale);
 
-        // Create a temporary RenderTexture and blit
         RenderTexture rt = RenderTexture.GetTemporary(newWidth, newHeight, 0, RenderTextureFormat.ARGB32);
         var prev = RenderTexture.active;
         Graphics.Blit(sourceTexture, rt);
         RenderTexture.active = rt;
 
-        // Read into a new readable Texture2D
-        Texture2D readableTex = new Texture2D(newWidth, newHeight, TextureFormat.RGB24, false);
+        var readableTex = new Texture2D(newWidth, newHeight, TextureFormat.RGB24, false);
         readableTex.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
         readableTex.Apply();
 
         RenderTexture.active = prev;
         RenderTexture.ReleaseTemporary(rt);
 
-        // Encode to JPG
-        byte[] imageBytes = readableTex.EncodeToJPG(60); // 60% quality
-        UnityEngine.Object.Destroy(readableTex);         // cleanup
+        byte[] imageBytes = readableTex.EncodeToJPG(85); // was 60
+        UnityEngine.Object.Destroy(readableTex);
 
-        return System.Convert.ToBase64String(imageBytes);
+        return Convert.ToBase64String(imageBytes);
     }
+
 
     //IEnumerator TypeText(string baseText, string newText, float delay = 0.02f)
     //{
@@ -1045,7 +957,7 @@ public class TechTutorAskUI : MonoBehaviour
                 return;
             }
 
-            Texture2D texture = NativeCamera.LoadImageAtPath(path, 512, false);
+            Texture2D texture = NativeCamera.LoadImageAtPath(path, 2048, false);
             if (texture != null)
             {
                 selectedImage = texture;
@@ -1075,74 +987,142 @@ public class TechTutorAskUI : MonoBehaviour
 #endif
     }
 
+    //public void OnARModeClicked()
+    //{
+    //    // Prefer current session data
+    //    Texture2D shot = selectedImage;
+    //    AIGuide guide = lastGuide;
+
+    //    // Fallback to cached if missing
+    //    if (guide == null || guide.steps == null || guide.steps.Length == 0 || shot == null)
+    //    {
+    //        if (LoadARGuideCache(out var cachedGuide, out var cachedImagePath))
+    //        {
+    //            // load the cached PNG into Texture2D
+    //            try
+    //            {
+    //                byte[] bytes = System.IO.File.ReadAllBytes(cachedImagePath);
+    //                Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+    //                tex.LoadImage(bytes);
+    //                shot = tex;
+    //                guide = cachedGuide;
+    //                Debug.Log("[ARCache] Using cached AR guide and image.");
+    //            }
+    //            catch (Exception e)
+    //            {
+    //                Debug.LogWarning("[ARCache] Could not load cached image: " + e.Message);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            Debug.LogWarning("[ARCache] No cache available.");
+    //        }
+    //    }
+
+    //    if (guide == null || guide.steps == null || guide.steps.Length == 0 || shot == null)
+    //    {
+    //        // show a simple message in your UI instead of emojis
+    //        responseText.text += "\n\n[AR] No steps/image available. Ask a question first.";
+    //        return;
+    //    }
+
+    //    GuideRunContext.I.screenshot = shot;
+    //    GuideRunContext.I.guide = guide;
+    //    if (TutorialSpecHolder.I != null)
+    //    {
+    //        // build from the last plain-text reply you already saved
+    //        var spec = ConvertToTutorialSpec(lastBotReply);
+    //        TutorialSpecHolder.I.spec = spec;
+    //    }
+
+    //    if (GuideRunContext.I != null && GuideRunContext.I.screenshot != null)
+    //    {
+    //        try
+    //        {
+    //            var png = GuideRunContext.I.screenshot.EncodeToPNG();
+    //            var path = Path.Combine(Application.persistentDataPath, "last_screenshot.png");
+    //            File.WriteAllBytes(path, png);
+    //            PlayerPrefs.SetString("last_image_path", path);
+    //            PlayerPrefs.Save();
+    //            Debug.Log("[AR] Saved last image to: " + path);
+    //        }
+    //        catch (System.Exception e)
+    //        {
+    //            Debug.LogWarning("[AR] Failed to save last image: " + e.Message);
+    //        }
+    //    }
+    //    //SceneManager.LoadScene("AR_ImageTest");
+    //    SceneManager.LoadScene("AR_PanelTutorial");
+    //    //SceneManager.LoadScene("AR_ImageBoardScene");
+    //}
+    //public void OnARModeClicked()
+    //{
+    //    // 1) make sure the singleton exists
+    //    EnsureGuideRunContext();
+
+    //    // 2) prefer current session (fallback to cache if needed)
+    //    Texture2D shot = selectedImage;
+    //    AIGuide guide = lastGuide;
+    //    if ((shot == null || guide == null || guide.steps == null || guide.steps.Length == 0)
+    //        && LoadARGuideCache(out var cachedGuide, out var cachedImagePath))
+    //    {
+    //        try
+    //        {
+    //            byte[] bytes = System.IO.File.ReadAllBytes(cachedImagePath);
+    //            var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+    //            tex.LoadImage(bytes);
+    //            shot = tex;
+    //            guide = cachedGuide;
+    //        }
+    //        catch { /* ignore */ }
+    //    }
+
+    //    if (shot == null) { Debug.LogWarning("[AR] No image available."); return; }
+    //    if (guide == null || guide.steps == null || guide.steps.Length == 0)
+    //    {
+    //        // Optional: build a simple guide from last plain-text reply
+    //        guide = BuildGuideFromPlainSteps(lastBotReply);
+    //    }
+
+    //    // 3) stash into the cross-scene context
+    //    GuideRunContext.I.screenshot = shot;
+    //    GuideRunContext.I.guide = guide;
+
+    //    // 4) go to your new AR scene that uses AR_RedboxRunner
+    //    UnityEngine.SceneManagement.SceneManager.LoadScene("TT2_OcrDemo_Test");
+    //}
+
     public void OnARModeClicked()
     {
-        // Prefer current session data
-        Texture2D shot = selectedImage;
-        AIGuide guide = lastGuide;
-
-        // Fallback to cached if missing
-        if (guide == null || guide.steps == null || guide.steps.Length == 0 || shot == null)
+        // Ensure singleton exists
+        if (GuideRunContext.I == null)
         {
-            if (LoadARGuideCache(out var cachedGuide, out var cachedImagePath))
-            {
-                // load the cached PNG into Texture2D
-                try
-                {
-                    byte[] bytes = System.IO.File.ReadAllBytes(cachedImagePath);
-                    Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                    tex.LoadImage(bytes);
-                    shot = tex;
-                    guide = cachedGuide;
-                    Debug.Log("[ARCache] Using cached AR guide and image.");
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning("[ARCache] Could not load cached image: " + e.Message);
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[ARCache] No cache available.");
-            }
+            var go = new GameObject("GuideRunContext");
+            go.AddComponent<GuideRunContext>();
         }
 
-        if (guide == null || guide.steps == null || guide.steps.Length == 0 || shot == null)
+        // Prefer the saved (cached) guide + image to avoid extra API calls
+        GuideModel g;
+        Texture2D tex;
+        if (ARCache.LoadGuide(out g) && ARCache.LoadImage(out tex))
         {
-            // show a simple message in your UI instead of emojis
-            responseText.text += "\n\n[AR] No steps/image available. Ask a question first.";
-            return;
+            GuideRunContext.I.guide = g;
+            GuideRunContext.I.screenshot = tex;
+            Debug.Log("[AR] Loaded cached guide + image (no API)");
+        }
+        else
+        {
+            // Fallback to current session in case cache is missing
+            GuideRunContext.I.guide = lastGuide;
+            GuideRunContext.I.screenshot = selectedImage;
+            Debug.Log("[AR] Using current session guide + image");
         }
 
-        GuideRunContext.I.screenshot = shot;
-        GuideRunContext.I.guide = guide;
-        if (TutorialSpecHolder.I != null)
-        {
-            // build from the last plain-text reply you already saved
-            var spec = ConvertToTutorialSpec(lastBotReply);
-            TutorialSpecHolder.I.spec = spec;
-        }
-
-        if (GuideRunContext.I != null && GuideRunContext.I.screenshot != null)
-        {
-            try
-            {
-                var png = GuideRunContext.I.screenshot.EncodeToPNG();
-                var path = Path.Combine(Application.persistentDataPath, "last_screenshot.png");
-                File.WriteAllBytes(path, png);
-                PlayerPrefs.SetString("last_image_path", path);
-                PlayerPrefs.Save();
-                Debug.Log("[AR] Saved last image to: " + path);
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogWarning("[AR] Failed to save last image: " + e.Message);
-            }
-        }
-        //SceneManager.LoadScene("AR_ImageTest");
-        SceneManager.LoadScene("AR_PanelTutorial");
-        //SceneManager.LoadScene("AR_ImageBoardScene");
+        // Load your red-box OCR scene
+        UnityEngine.SceneManagement.SceneManager.LoadScene("TT2_OcrDemo_Test");
     }
+
+
 
 
     //public void OnARModeClicked()
@@ -1212,7 +1192,7 @@ public class TechTutorAskUI : MonoBehaviour
         {
             if (path != null)
             {
-                Texture2D texture = NativeGallery.LoadImageAtPath(path, 512, false);
+                Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048, false);
                 if (texture != null)
                 {
                     selectedImage = texture;

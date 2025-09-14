@@ -29,6 +29,18 @@ public class SpeechToTextDemo : MonoBehaviour, ISpeechToTextListener
     {
         SpeechToText.Initialize("en-US");
         StartSpeechToTextButton.onClick.AddListener(ToggleSpeechToText);
+
+        // Auto-find narration AudioSource if not assigned
+        if (!ttsAudio)
+        {
+            var narr = FindObjectOfType<NarrationPlayerPersistent>(true);
+            if (narr)
+            {
+                var src = narr.GetComponent<AudioSource>();
+                if (src) ttsAudio = src;
+                Debug.Log("[Voice] Auto-assigned NarrationPlayerPersistent AudioSource to ttsAudio.");
+            }
+        }
     }
 
     private void Update()
@@ -150,11 +162,14 @@ public class SpeechToTextDemo : MonoBehaviour, ISpeechToTextListener
 
     void ISpeechToTextListener.OnPartialResultReceived(string spokenText)
     {
+        if (ttsAudio && ttsAudio.isPlaying) return; // ignore while TTS
         SpeechText.text = spokenText;
     }
 
     void ISpeechToTextListener.OnResultReceived(string spokenText, int? errorCode)
     {
+        if (ttsAudio && ttsAudio.isPlaying) return;
+
         if (!string.IsNullOrEmpty(spokenText))
         {
             string cmd = spokenText.ToLower().Trim();

@@ -23,6 +23,8 @@ public class SceneOrientationManager : MonoBehaviour
             case "AR_GmailTutorial":
             case "AR_SnippingToolsTutorial":
             case "AR_AI_Tutorial":
+            case "AR_PortraitMode_MsWord":
+            case "AR_DeskSimulation_Gmail":
                 SetPortraitOnly();
                 break;
 
@@ -49,8 +51,8 @@ public class SceneOrientationManager : MonoBehaviour
             case "Test_CompComponents":
             case "AR_DeskSimulation":
             case "AR_DeskSimulation_MicrosoftWord":
-            case "AR_DeskSimulation_Gmail":
             case "AR_QRQuiz":
+            case "TT2_OcrDemo_Test":
                 SetLandscapeOnly();
                 break;
 

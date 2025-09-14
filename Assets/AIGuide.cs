@@ -3,16 +3,13 @@ using System;
 [Serializable]
 public class AIGuide
 {
-    public StepItem[] steps;
+    public AIGuideStep[] steps;
 }
 
 [Serializable]
-public class StepItem
+public class AIGuideStep
 {
     public string title;
     public string instruction;
     public string[] keywords;
-    public string[] alts;
-    public string action_type;
-    public string notes;
 }

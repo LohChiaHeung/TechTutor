@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SendEmailScene.unity
     guid: 86741172bc24f2f40959d548b479e7e4
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/CalculatorTutorial.unity
     guid: 26dd4cf7cc5fccc47b4bb81ecf9a06c3
   - enabled: 0
@@ -101,6 +101,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AR_QRQuiz.unity
     guid: 7bdf5d1e69961a943a962b1d7dbdc621
+  - enabled: 1
+    path: Assets/Scenes/TT2_OcrDemo.unity
+    guid: de4dc6f6fc52c954791c185dc7af4375
+  - enabled: 1
+    path: Assets/Scenes/TT2_OcrDemo_Test.unity
+    guid: ab13c39fb88720d4b8c4cadb596f28df
+  - enabled: 1
+    path: Assets/Scenes/TT2_OcrDemo_TestAR.unity
+    guid: 4d31755dbf775be4d87d962b74ed183d
+  - enabled: 1
+    path: Assets/Scenes/AR_PortraitMode_MsWord.unity
+    guid: 83b4bc53fd2de1a45853b391d9045d2d
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ecf4052a9f1ec244d93fe8ebf16fa90c, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 4b9f877914f7744459c8317b2b0542ef, type: 2}

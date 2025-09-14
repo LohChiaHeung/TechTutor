@@ -27,6 +27,8 @@ public class AIQuizGenerator_OpenAI : MonoBehaviour
         public string model;
         public ResponseFormat response_format;
         public ChatMessage[] messages;
+        public float temperature;
+        public int max_tokens;
     }
     [System.Serializable] private class ChatResp { public Choice[] choices; }
     [System.Serializable] private class Choice { public Msg message; }
@@ -78,6 +80,8 @@ Rules:
             {
                 model = string.IsNullOrEmpty(config.chatModel) ? "gpt-4o-mini" : config.chatModel,
                 response_format = new ResponseFormat { type = "json_object" },
+                temperature = 0.2f,
+                max_tokens = 900,
                 messages = new ChatMessage[]
                 {
                     new ChatMessage { role = "system", content = systemMsg },

@@ -43,9 +43,9 @@ public class SpeakerInteraction : MonoBehaviour
                 case "BassPort":
                     ShowPanel("Bass Reflex Port", "🔉 Enhances low-frequency sounds (bass) for deeper audio.");
                     break;
-                case "PowerButton":
-                    ShowPanel("Power Button", "⚡️ Turns the speaker on or off.");
-                    break;
+                //case "PowerButton_Speaker":
+                //    ShowPanel("Power Button", "⚡️ Turns the speaker on or off.");
+                //    break;
                 default:
                     Debug.Log("[SpeakerInteraction] No panel setup for: " + partName);
                     break;

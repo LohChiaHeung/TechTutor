@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.google.external-dependency-manager": {
+      "version": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "6eee66190fb6d7182518cc3b41e3919e054699b6"
+    },
     "com.ptc.vuforia.engine": {
       "version": "file:com.ptc.vuforia.engine-11.0.4.tgz",
       "depth": 0,

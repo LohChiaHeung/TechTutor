@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.google.external-dependency-manager": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",
     "com.ptc.vuforia.engine": "file:com.ptc.vuforia.engine-11.0.4.tgz",
     "com.unity.barracuda": "3.0.0",
     "com.unity.cloud.gltfast": "6.13.1",
