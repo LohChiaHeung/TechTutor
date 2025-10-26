@@ -7,6 +7,8 @@ public class GuideRunContext : MonoBehaviour
     // data to hand to AR_ImageTest
     public Texture2D screenshot;   // the captured image (or null if not set)
     public AIGuide guide;          // AI steps (JSON parsed)
+    public string audioDir;    // directory with step_XX.wav files
+
 
     void Awake()
     {

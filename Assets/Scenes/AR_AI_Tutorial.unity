@@ -3353,7 +3353,8 @@ MonoBehaviour:
   devFixedReply: "Step 1: Open the folder\n\u2192 Click the 'Documents' folder in
     the window\n\nStep 2: Type with the keyboard\n\u2192 Enter your file name in
     the name box\n\nStep 3: Press Enter\n\u2192 Confirm to proceed"
-  loadTestImageFromResources: 1
+  allowSmallImages: 1
+  loadTestImageFromResources: 0
 --- !u!224 &822184960
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5307,7 +5308,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1600116364}
   m_HandleRect: {fileID: 1798563240}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

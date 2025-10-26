@@ -14,6 +14,8 @@ using NativeCameraNamespace;
 using System;
 using System.Linq;
 using GuideModel = global::AIGuide;
+using System.Security.Cryptography;
+using System.Text;
 
 public class TechTutorAskUI : MonoBehaviour
 {
@@ -24,6 +26,7 @@ public class TechTutorAskUI : MonoBehaviour
     public ScrollRect inputScroll;
     public Button arModeButton;
     public Button captureImageButton;
+    private const string TTS_AUDIO_EXT = ".mp3";
 
     public Button uploadImageButton;
     private Texture2D selectedImage = null;
@@ -35,6 +38,9 @@ public class TechTutorAskUI : MonoBehaviour
     public GameObject fullScreenImagePanel;
     public RawImage fullScreenImage;
     public Button closeFullScreenButton;
+
+    private const int MIN_LONG_EDGE = 1200;   // e.g., 1200–1600
+    private const int MIN_BYTES = 150_000; // ~150 KB
 
     private GuideModel lastGuide;
 
@@ -56,6 +62,14 @@ public class TechTutorAskUI : MonoBehaviour
     "Step 3: Press Enter\n" +
     "→ Confirm to proceed";
 
+    [SerializeField] bool allowSmallImages = false;   // expose in Inspector
+    private byte[] _fullResImageBytes;   // original file bytes (for OCR/cache)
+    private Texture2D _fullResTex;
+
+    [SerializeField] bool preRenderTTS = false;
+    [SerializeField] string ttsModel = "gpt-4o-mini-tts";
+    [SerializeField] string ttsVoice = "alloy";
+
     // OPTIONAL: auto-load a test image from Resources for preview
     public bool loadTestImageFromResources = true;
 
@@ -74,6 +88,122 @@ public class TechTutorAskUI : MonoBehaviour
     {
         return System.IO.Path.Combine(Application.persistentDataPath, "ar_guide_cache.json");
     }
+
+    //string GetGuideId(AIGuide guide)
+    //{
+    //    using var sha = SHA256.Create();
+    //    var sb = new StringBuilder();
+    //    if (guide?.steps != null)
+    //    {
+    //        for (int i = 0; i < guide.steps.Length; i++)
+    //        {
+    //            // No .text — use title + instruction
+    //            var s = guide.steps[i];
+    //            sb.Append((i + 1) + "|" + (s.title ?? "").Trim() + "|" + (s.instruction ?? "").Trim() + "\n");
+    //        }
+    //    }
+    //    var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString()));
+    //    return System.BitConverter.ToString(bytes, 0, 8).Replace("-", "").ToLowerInvariant();
+    //}
+
+    //string GetGuideAudioDir(AIGuide guide)
+    //{
+    //    return Path.Combine(Application.persistentDataPath, "GuideAudio", GetGuideId(guide));
+    //}
+
+    //string MakeStepSpeech(AIGuideStep step, int index1Based)
+    //{
+    //    // Build a clean spoken string: “Step N. <title>. <instruction>”
+    //    var title = (step.title ?? "").Trim();
+    //    // Strip leading “Step X:” from title if present
+    //    if (title.StartsWith("Step ", System.StringComparison.OrdinalIgnoreCase))
+    //    {
+    //        int colon = title.IndexOf(':');
+    //        if (colon >= 0 && colon + 1 < title.Length) title = title.Substring(colon + 1).Trim();
+    //    }
+    //    var instr = (step.instruction ?? "").Trim();
+    //    var parts = new System.Collections.Generic.List<string>();
+    //    parts.Add($"Step {index1Based}.");
+    //    if (!string.IsNullOrEmpty(title)) parts.Add(title);
+    //    if (!string.IsNullOrEmpty(instr)) parts.Add(instr);
+    //    return string.Join(" ", parts);
+    //}
+
+    //IEnumerator EnsureGuideTtsReady(AIGuide guide)
+    //{
+    //    if (guide == null || guide.steps == null || guide.steps.Length == 0) yield break;
+
+    //    string dir = GetGuideAudioDir(guide);
+    //    Directory.CreateDirectory(dir);
+
+    //    for (int i = 0; i < guide.steps.Length; i++)
+    //    {
+    //        string text = MakeStepSpeech(guide.steps[i], i + 1);
+    //        string wavPath = Path.Combine(dir, $"step_{i + 1:D2}.mp3");
+
+    //        if (!File.Exists(wavPath) || new FileInfo(wavPath).Length < 1024)
+    //        {
+    //            Debug.Log($"[TTS] Synth {i + 1}/{guide.steps.Length} → {wavPath}");
+    //            // TODO: REPLACE with your real TTS call (e.g., your Quiz TTS)
+    //            // yield return StartCoroutine(TTSManager.SpeakToFile(text, wavPath, ttsVoice));
+    //            yield return StartCoroutine(TTS_SynthesizeToFile(text, wavPath, ttsVoice)); // placeholder
+    //        }
+    //    }
+
+    //    // Make the folder discoverable by both modes (no need to change GuideRunContext)
+    //    PlayerPrefs.SetString("tts_audio_dir", dir);
+    //    PlayerPrefs.Save();
+    //    Debug.Log("[TTS] Ready: " + dir);
+    //}
+
+    // ----- Placeholder so it compiles now; replace with your real TTS -----
+//    IEnumerator TTS_SynthesizeToFile(string text, string outPath, string voice)
+//    {
+//        var url = "https://api.openai.com/v1/audio/speech";
+
+//        // MP3 output (Unity loads as AudioType.MPEG)
+//        string payload = "{"
+//            + "\"model\":\"" + ttsModel + "\","
+//            + "\"voice\":\"" + voice + "\","
+//            + "\"format\":\"mp3\","
+//            + "\"input\":\"" + EscapeJson(text) + "\""
+//            + "}";
+
+//        var req = new UnityWebRequest(url, "POST");
+//        var bytes = Encoding.UTF8.GetBytes(payload);
+//        req.uploadHandler = new UploadHandlerRaw(bytes);
+//        req.downloadHandler = new DownloadHandlerBuffer();
+//        req.SetRequestHeader("Content-Type", "application/json");
+//        req.SetRequestHeader("Authorization", "Bearer " + openAIKey);
+
+//        yield return req.SendWebRequest();
+
+//#if UNITY_2020_3_OR_NEWER
+//        if (req.result != UnityWebRequest.Result.Success)
+//#else
+//    if (req.isNetworkError || req.isHttpError)
+//#endif
+//        {
+//            // Log server message if present (often JSON with error)
+//            Debug.LogWarning("[TTS] HTTP " + req.responseCode + ": " + req.error + "\n" + req.downloadHandler.text);
+//            yield break;
+//        }
+
+//        try
+//        {
+//            var audio = req.downloadHandler.data; // MP3 bytes
+//            Directory.CreateDirectory(Path.GetDirectoryName(outPath));
+//            File.WriteAllBytes(outPath, audio);
+//            Debug.Log($"[TTS] Wrote {audio.Length} bytes → {outPath}");
+//        }
+//        catch (Exception ex)
+//        {
+//            Debug.LogWarning("[TTS] Write failed: " + ex.Message);
+//        }
+//    }
+
+
+
 
     void SaveARGuideCache(GuideModel guide, string imagePath)
     {
@@ -185,7 +315,7 @@ public class TechTutorAskUI : MonoBehaviour
 
 
     }
-
+  
     string SaveTextureToPng(Texture2D tex, string fileNameNoExt)
     {
         try
@@ -241,18 +371,6 @@ public class TechTutorAskUI : MonoBehaviour
         return b.ToString().TrimEnd();
     }
 
-    //    string systemPrompt =
-    //"You are TechTutor, an AI assistant that explains computer tasks step-by-step.\n\n" +
-    //"Always respond in this STRICT plain-text format ONLY (no markdown, no headings, no code fences):\n" +
-    //"Step 1: <short action>\n" +
-    //"→ <very brief explanation>\n\n" +
-    //"Step 2: <short action>\n" +
-    //"→ <very brief explanation>\n\n" +
-    //"- Include 4–6 steps if needed\n" +
-    //"- Use simple words\n" +
-    //"- Do NOT add greetings, summaries, tips, or anything else\n" +
-    //"- Do NOT use ### or any markdown\n" +
-    //"- Do NOT wrap your answer in JSON or code fences\n";
     IEnumerator SendMessageToOpenAI(string userMessage)
     {
         string json = "";
@@ -268,7 +386,7 @@ public class TechTutorAskUI : MonoBehaviour
 "Step 2: <short action>\n" +
 "→ <very brief explanation>\n" +
 "Keywords: <1-3 exact UI tokens from the image, comma-separated>\n\n" +
-"- Include 4–6 steps if needed\n" +
+"- Include 3–5 steps if needed\n" +
 "- Use simple words\n" +
 "- Keywords MUST be short, verbatim labels visible in the IMAGE (menu text, button labels, tab names, shortcuts like Ctrl+C)\n" +
 "- Do NOT invent tokens; if none are visible for a step, write: Keywords: (none)\n" +
@@ -817,21 +935,7 @@ public class TechTutorAskUI : MonoBehaviour
     }
 
 
-    //IEnumerator TypeText(string baseText, string newText, float delay = 0.02f)
-    //{
-    //    string current = baseText;
 
-    //    for (int i = 0; i < newText.Length; i++)
-    //    {
-    //        current += newText[i];
-    //        responseText.text = current;
-
-    //        Canvas.ForceUpdateCanvases();
-    //       //chatScrollRect.verticalNormalizedPosition = 0f;
-
-    //        yield return new WaitForSeconds(delay);
-    //    }
-    //}
     IEnumerator TypeText(string baseText, string newText, float delay = 0.02f)
     {
         string current = baseText;
@@ -946,46 +1050,96 @@ public class TechTutorAskUI : MonoBehaviour
     //#endif
     //    }
 
+    // Latest 22/9/25
+    //    void CaptureImageFromCamera()
+    //    {
+    //#if UNITY_ANDROID || UNITY_IOS
+    //        NativeCamera.TakePicture((path) =>
+    //        {
+    //            if (string.IsNullOrEmpty(path))
+    //            {
+    //                Debug.LogWarning("❌ Camera capture canceled.");
+    //                return;
+    //            }
+
+    //            // Preview/working texture (can keep 2048 for UI)
+    //            Texture2D texture = NativeCamera.LoadImageAtPath(path, 2048, false);
+    //            if (texture != null)
+    //            {
+    //                selectedImage = texture;
+    //                if (previewImage)
+    //                {
+    //                    previewImage.texture = selectedImage;
+    //                    previewImageObject.SetActive(true);
+    //                    previewImage.gameObject.SetActive(true);
+    //                }
+
+    //                // ✅ SAVE THE ORIGINAL FILE (no re-encode, no downscale)
+    //                string ext = System.IO.Path.GetExtension(path);                   // .jpg or .png
+    //                string savedPath = System.IO.Path.Combine(
+    //                    Application.persistentDataPath, "last_image_original" + ext); // keep original format
+    //                System.IO.File.Copy(path, savedPath, overwrite: true);            // <-- key change
+
+    //                PlayerPrefs.SetString("last_image_path", savedPath);
+    //                PlayerPrefs.Save();
+
+    //                Debug.Log($"✅ Image captured: preview={selectedImage.width}x{selectedImage.height}, saved original: {savedPath}");
+    //            }
+    //            else
+    //            {
+    //                Debug.LogWarning("⚠️ Failed to load captured image.");
+    //            }
+    //        },
+    //        maxSize: 2048,
+    //        preferredCamera: NativeCamera.PreferredCamera.Rear);
+    //#else
+    //    Debug.LogWarning("⚠️ Camera capture only supported on Android/iOS.");
+    //#endif
+    //    }
+
     void CaptureImageFromCamera()
     {
 #if UNITY_ANDROID || UNITY_IOS
         NativeCamera.TakePicture((path) =>
         {
-            if (string.IsNullOrEmpty(path))
-            {
-                Debug.LogWarning("❌ Camera capture canceled.");
-                return;
-            }
+            if (string.IsNullOrEmpty(path)) { Debug.LogWarning("❌ Camera capture canceled."); return; }
 
             Texture2D texture = NativeCamera.LoadImageAtPath(path, 2048, false);
-            if (texture != null)
-            {
-                selectedImage = texture;
+            if (texture == null) { Debug.LogWarning("⚠️ Failed to load captured image."); return; }
 
-                // ✅ Show image preview
+            // ⬇️ INSERT THIS GUARD HERE
+            int w = texture.width, h = texture.height;
+            int longEdge = Mathf.Max(w, h);
+            long fileBytes = 0; try { fileBytes = new System.IO.FileInfo(path).Length; } catch { }
+            if (!allowSmallImages && (longEdge < MIN_LONG_EDGE || fileBytes < MIN_BYTES))
+            {
+                Debug.LogWarning($"[Pick] Too small for OCR: {w}x{h}, bytes≈{fileBytes}.");
+                return;
+            }
+            // ⬆️ END GUARD
+
+            selectedImage = texture;
+            if (previewImage)
+            {
                 previewImage.texture = selectedImage;
                 previewImageObject.SetActive(true);
                 previewImage.gameObject.SetActive(true);
-
-                // ✅ Save to persistent path
-                string savedPath = System.IO.Path.Combine(Application.persistentDataPath, "last_image.png");
-                System.IO.File.WriteAllBytes(savedPath, selectedImage.EncodeToPNG());
-                Debug.Log("✅ Image captured & saved: " + savedPath);
-
-                PlayerPrefs.SetString("last_image_path", savedPath);
-                PlayerPrefs.Save();
             }
-            else
-            {
-                Debug.LogWarning("⚠️ Failed to load captured image.");
-            }
-        },
-        maxSize: 2048,
-        preferredCamera: NativeCamera.PreferredCamera.Rear);
+
+            string ext = System.IO.Path.GetExtension(path);
+            string savedPath = System.IO.Path.Combine(Application.persistentDataPath, "last_image_original" + ext);
+            System.IO.File.Copy(path, savedPath, overwrite: true);
+            PlayerPrefs.SetString("last_image_path", savedPath);
+            PlayerPrefs.Save();
+
+            Debug.Log($"✅ Camera OK: tex={w}x{h}, origBytes={fileBytes}");
+        }, maxSize: 2048, preferredCamera: NativeCamera.PreferredCamera.Rear);
 #else
     Debug.LogWarning("⚠️ Camera capture only supported on Android/iOS.");
 #endif
     }
+
+
 
     //public void OnARModeClicked()
     //{
@@ -1092,13 +1246,108 @@ public class TechTutorAskUI : MonoBehaviour
     //    UnityEngine.SceneManagement.SceneManager.LoadScene("TT2_OcrDemo_Test");
     //}
 
-    public void OnARModeClicked()
+    // Latest - 12.15pm 22/9/25
+    //public void OnARModeClicked()
+    //{
+    //    // Ensure singleton exists
+    //    if (GuideRunContext.I == null)
+    //    {
+    //        var go = new GameObject("GuideRunContext");
+    //        go.AddComponent<GuideRunContext>();
+    //    }
+
+    //    // Prefer the saved (cached) guide + image to avoid extra API calls
+    //    GuideModel g;
+    //    Texture2D tex;
+    //    if (ARCache.LoadGuide(out g) && ARCache.LoadImage(out tex))
+    //    {
+    //        GuideRunContext.I.guide = g;
+    //        GuideRunContext.I.screenshot = tex;
+    //        Debug.Log("[AR] Loaded cached guide + image (no API)");
+    //    }
+    //    else
+    //    {
+    //        // Fallback to current session in case cache is missing
+    //        GuideRunContext.I.guide = lastGuide;
+    //        GuideRunContext.I.screenshot = selectedImage;
+    //        Debug.Log("[AR] Using current session guide + image");
+    //    }
+
+    //    // Load your red-box OCR scene
+    //    UnityEngine.SceneManagement.SceneManager.LoadScene("TT2_OcrDemo_Test");
+    //}
+
+    //public void OnARModeClicked()
+    //{
+    //    // Ensure singleton exists
+    //    if (GuideRunContext.I == null)
+    //    {
+    //        var go = new GameObject("GuideRunContext");
+    //        go.AddComponent<GuideRunContext>();
+    //    }
+
+    //    // Prefer the saved (cached) guide + image to avoid extra API calls
+    //    GuideModel g;
+    //    Texture2D tex;
+    //    if (ARCache.LoadGuide(out g) && ARCache.LoadImage(out tex))
+    //    {
+    //        GuideRunContext.I.guide = g;
+    //        GuideRunContext.I.screenshot = tex;
+    //        Debug.Log("[AR] Loaded cached guide + image (no API)");
+    //        if (preRenderTTS && GuideRunContext.I?.guide != null)
+    //            StartCoroutine(EnsureGuideTtsReady(GuideRunContext.I.guide));
+    //    }
+    //    else
+    //    {
+    //        // Fallback to current session in case cache is missing
+    //        GuideRunContext.I.guide = lastGuide;
+    //        GuideRunContext.I.screenshot = selectedImage as Texture2D;
+    //        Debug.Log("[AR] Using current session guide + image");
+    //    }
+
+    //    // 🔥 Override with FULL-RES original file if available (so OCR/overlay are sharp)
+    //    try
+    //    {
+    //        string origPath = PlayerPrefs.GetString("last_image_path", null);
+    //        if (!string.IsNullOrEmpty(origPath) && File.Exists(origPath))
+    //        {
+    //            byte[] bytes = File.ReadAllBytes(origPath);
+
+    //            // Build a full-resolution, readable texture (no mipmaps)
+    //            var fullTex = new Texture2D(2, 2, TextureFormat.RGBA32, mipChain: false, linear: false);
+    //            fullTex.LoadImage(bytes, markNonReadable: false);
+
+    //            // Crisp sampling for text UIs
+    //            fullTex.filterMode = FilterMode.Point;   // or Bilinear if you prefer slight smoothing
+    //            fullTex.wrapMode = TextureWrapMode.Clamp;
+    //            fullTex.anisoLevel = 0;
+
+    //            GuideRunContext.I.screenshot = fullTex;
+    //            Debug.Log($"[AR] Overrode screenshot with original file: {fullTex.width}x{fullTex.height} ({bytes.Length} bytes)");
+    //        }
+    //        else
+    //        {
+    //            Debug.Log("[AR] No original file found at last_image_path; using cached/session texture.");
+    //        }
+    //    }
+    //    catch (System.Exception ex)
+    //    {
+    //        Debug.LogWarning("[AR] Full-res override failed: " + ex.Message);
+    //    }
+
+    //    // Load your red-box OCR scene
+    //    UnityEngine.SceneManagement.SceneManager.LoadScene("TT2_OcrDemo_Test");
+    //}
+    public void OnARModeClicked() => StartCoroutine(Co_OpenAR());
+
+    private IEnumerator Co_OpenAR()
     {
         // Ensure singleton exists
         if (GuideRunContext.I == null)
         {
             var go = new GameObject("GuideRunContext");
             go.AddComponent<GuideRunContext>();
+            // optional: yield return null; // let Awake() run one frame
         }
 
         // Prefer the saved (cached) guide + image to avoid extra API calls
@@ -1114,13 +1363,44 @@ public class TechTutorAskUI : MonoBehaviour
         {
             // Fallback to current session in case cache is missing
             GuideRunContext.I.guide = lastGuide;
-            GuideRunContext.I.screenshot = selectedImage;
+            GuideRunContext.I.screenshot = selectedImage as Texture2D;
             Debug.Log("[AR] Using current session guide + image");
         }
 
-        // Load your red-box OCR scene
-        UnityEngine.SceneManagement.SceneManager.LoadScene("TT2_OcrDemo_Test");
+        // Override with FULL-RES original file if available
+        try
+        {
+            string origPath = PlayerPrefs.GetString("last_image_path", null);
+            if (!string.IsNullOrEmpty(origPath) && System.IO.File.Exists(origPath))
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(origPath);
+                var fullTex = new Texture2D(2, 2, TextureFormat.RGBA32, mipChain: false, linear: false);
+                fullTex.LoadImage(bytes, markNonReadable: false);
+                fullTex.filterMode = FilterMode.Point;
+                fullTex.wrapMode = TextureWrapMode.Clamp;
+                fullTex.anisoLevel = 0;
+                GuideRunContext.I.screenshot = fullTex;
+                Debug.Log($"[AR] Overrode screenshot with original file: {fullTex.width}x{fullTex.height} ({bytes.Length} bytes)");
+            }
+            else
+            {
+                Debug.Log("[AR] No original file found at last_image_path; using cached/session texture.");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning("[AR] Full-res override failed: " + ex.Message);
+        }
+
+        // Load scene asynchronously and yield until it finishes
+        AsyncOperation op = SceneManager.LoadSceneAsync("TT2_OcrDemo_Test", LoadSceneMode.Single);
+        while (!op.isDone)
+            yield return null;
+
+        // done
+        yield break;
     }
+
 
 
 
@@ -1185,46 +1465,92 @@ public class TechTutorAskUI : MonoBehaviour
     //#endif
     //    }
 
+    //    void OpenImagePicker()
+    //    {
+    //#if UNITY_ANDROID || UNITY_IOS
+    //        NativeGallery.GetImageFromGallery((path) =>
+    //        {
+    //            if (path != null)
+    //            {
+    //                Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048, false);
+    //                if (texture != null)
+    //                {
+    //                    selectedImage = texture;
+
+    //                    // ✅ Show image preview
+    //                    previewImage.texture = selectedImage;
+    //                    previewImage.gameObject.SetActive(true);
+    //                    previewImageObject.SetActive(true);
+
+    //                    // ✅ Save to persistent path
+    //                    string savedPath = System.IO.Path.Combine(Application.persistentDataPath, "last_image.png");
+    //                    System.IO.File.WriteAllBytes(savedPath, selectedImage.EncodeToPNG());
+    //                    Debug.Log("✅ Image selected & saved: " + savedPath);
+
+    //                    PlayerPrefs.SetString("last_image_path", savedPath);
+    //                    PlayerPrefs.Save();
+    //                    Debug.Log("✅ Image selected & saved: " + savedPath);
+    //                }
+    //                else
+    //                {
+    //                    Debug.LogWarning("⚠️ Failed to load image.");
+    //                }
+    //            }
+    //            else
+    //            {
+    //                Debug.LogWarning("❌ No image selected.");
+    //            }
+    //        }, "Select an image for TechTutor to analyze.");
+    //#else
+    //        Debug.LogWarning("⚠️ Image picker only supported on Android/iOS.");
+    //#endif
+    //    }
+
     void OpenImagePicker()
     {
 #if UNITY_ANDROID || UNITY_IOS
         NativeGallery.GetImageFromGallery((path) =>
         {
-            if (path != null)
+            if (string.IsNullOrEmpty(path)) { Debug.LogWarning("❌ No image selected."); return; }
+
+            Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048, false);
+            if (texture == null) { Debug.LogWarning("⚠️ Failed to load image."); return; }
+
+            // ⬇️ INSERT THIS GUARD HERE
+            int w = texture.width, h = texture.height;
+            int longEdge = Mathf.Max(w, h);
+            long fileBytes = 0; try { fileBytes = new System.IO.FileInfo(path).Length; } catch { }
+            if (!allowSmallImages && (longEdge < MIN_LONG_EDGE || fileBytes < MIN_BYTES))
             {
-                Texture2D texture = NativeGallery.LoadImageAtPath(path, 2048, false);
-                if (texture != null)
-                {
-                    selectedImage = texture;
-
-                    // ✅ Show image preview
-                    previewImage.texture = selectedImage;
-                    previewImage.gameObject.SetActive(true);
-                    previewImageObject.SetActive(true);
-
-                    // ✅ Save to persistent path
-                    string savedPath = System.IO.Path.Combine(Application.persistentDataPath, "last_image.png");
-                    System.IO.File.WriteAllBytes(savedPath, selectedImage.EncodeToPNG());
-                    Debug.Log("✅ Image selected & saved: " + savedPath);
-
-                    PlayerPrefs.SetString("last_image_path", savedPath);
-                    PlayerPrefs.Save();
-                    Debug.Log("✅ Image selected & saved: " + savedPath);
-                }
-                else
-                {
-                    Debug.LogWarning("⚠️ Failed to load image.");
-                }
+                Debug.LogWarning($"[Pick] Too small for OCR: {w}x{h}, bytes≈{fileBytes}.");
+                return;
             }
-            else
-            {
-                Debug.LogWarning("❌ No image selected.");
-            }
+            // ⬆️ END GUARD
+
+            // proceed as usual
+            selectedImage = texture;
+            previewImage.texture = selectedImage;
+            previewImageObject.SetActive(true);
+            previewImage.gameObject.SetActive(true);
+
+            // save/copy ORIGINAL file to app storage (recommended)
+            string ext = System.IO.Path.GetExtension(path);
+            string savedPath = System.IO.Path.Combine(Application.persistentDataPath, "last_image_original" + ext);
+            System.IO.File.Copy(path, savedPath, overwrite: true);
+            PlayerPrefs.SetString("last_image_path", savedPath);
+            PlayerPrefs.Save();
+
+            Debug.Log($"✅ Gallery OK: tex={w}x{h}, origBytes={fileBytes}");
         }, "Select an image for TechTutor to analyze.");
 #else
     Debug.LogWarning("⚠️ Image picker only supported on Android/iOS.");
 #endif
     }
+
+
+
+
+
 
     bool IsNearBottom(float threshold = 0.1f)
     {
