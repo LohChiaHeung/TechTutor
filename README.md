@@ -7,6 +7,14 @@ TechTutor is an <b>Augmented Reality (AR)</b> and <b>Artificial Intelligence (AI
 
 <hr>
 
+<h2>📹 Project Demonstration: </h2>
+ <a href="https://youtu.be/JLHGkUTf0AA" target="_blank">
+    <img src="https://img.youtube.com/vi/JLHGkUTf0AA/0.jpg" alt="TechTutor Video Demo" width="600"/><br>
+    ▶️ Click here to watch the full demonstration on YouTube.
+  </a>
+
+<hr>
+
 <h2>🧩 Features:</h2>
 <ul>
   <li><b>AR Learn:</b> Identify and explore 3D models of computer components with narration.</li>
