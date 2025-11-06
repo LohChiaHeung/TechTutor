@@ -4,7 +4,19 @@
 <p>
 TechTutor is an <b>Augmented Reality (AR)</b> and <b>Artificial Intelligence (AI)</b> integrated mobile learning application designed to help beginners and older adults learn basic computer and technology skills. It provides step-by-step tutorials, 3D AR visualizations, and AI-powered guidance to make digital literacy more interactive and accessible.
 </p>
+<ul>
+  <li>Shortlisted as one of <b>19 finalist projects</b> in the AutoCount FICT Competition 2025.</li>
+</ul>
 
+<hr>
+
+<h2>📝 Project Documentation: </h2>
+<p>
+View Report (PDF): https://github.com/LohChiaHeung/TechTutor/blob/main/23ACB01684_FYP2.pdf <br>
+View Poster: https://github.com/LohChiaHeung/TechTutor/blob/main/FYP%202%20-%20Poster.png <br>
+ View PPT Slide: https://github.com/LohChiaHeung/TechTutor/blob/main/FYP%202%20-%20Presentation.pptx <br><br>
+<img src="https://github.com/LohChiaHeung/TechTutor/blob/main/FYP%202%20-%20Poster.png" alt="Project Poster" width="500">
+</p>
 <hr>
 
 <h2>📹 Project Demonstration: </h2>
@@ -60,15 +72,8 @@ TechTutor is an <b>Augmented Reality (AR)</b> and <b>Artificial Intelligence (AI
 
 <hr>
 
-<h2>🏅 Achievements</h2>
-<ul>
-  <li>Shortlisted as one of <b>19 finalist projects</b> in the AutoCount FICT Competition 2025.</li>
-</ul>
-
-<hr>
-
 <h2>📜 License</h2>
 <p>
 © 2025 Loh Chia Heung. All rights reserved.<br>
-This project was developed as part of the Bachelor of Computer Science (Honours) at Universiti Tunku Abdul Rahman (UTAR).
+This project was developed as part of the Bachelor of Computer Science (Honours) FYP at Universiti Tunku Abdul Rahman (UTAR).
 </p>
