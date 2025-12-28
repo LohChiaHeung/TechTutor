@@ -9,10 +9,9 @@ TechTutor is an <b>Augmented Reality (AR)</b> and <b>Artificial Intelligence (AI
 </ul>
 
 <hr>
-
 <h2>📝 Project Documentation: </h2>
 <p>
-View Report (PDF): https://github.com/LohChiaHeung/TechTutor/blob/main/23ACB01684_FYP2.pdf <br>
+View Report (PDF): https://github.com/LohChiaHeung/TechTutor/blob/main/23ACB01684_FYP2.pdf or http://eprints.utar.edu.my/7133/1/fyp_CS_2025_LCH.pdf<br>
 View Poster: https://github.com/LohChiaHeung/TechTutor/blob/main/FYP%202%20-%20Poster.png <br>
  View PPT Slide: https://github.com/LohChiaHeung/TechTutor/blob/main/FYP%202%20-%20Presentation.pptx <br><br>
 <img src="https://github.com/LohChiaHeung/TechTutor/blob/main/FYP%202%20-%20Poster.png" alt="Project Poster" width="500">
