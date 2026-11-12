@@ -7,7 +7,7 @@ public class OpenRouterChat : MonoBehaviour
 {
     public TMP_InputField inputField;
     public TMP_Text outputText;
-    public string openRouterApiKey = "sk-or-v1-a58a3a14467d3de14fc950cd0e1a3e4e55e800a6cde3835c17842a7dbf23570esk-or-v1-a58a3a14467d3de14fc950cd0e1a3e4e55e800a6cde3835c17842a7dbf23570e";
+    public string openRouterApiKey = "sk-or-v1-*****";
 
     public void OnSendClicked()
     {
